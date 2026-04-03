@@ -9,14 +9,16 @@ const imFellDWPica = IM_Fell_DW_Pica({
 export function Navbar() {
   return (
     <nav className={`${imFellDWPica.className} w-full h-20 text-white flex items-center justify-between py-4 px-10`}>
-      <Image
-        className="dark:invert"
-        src="/logo.svg"
-        alt="Logo de josevitola.net"
-        width={80}
-        height={15}
-        priority
-      />
+      <a href="/">
+        <Image
+          className="dark:invert"
+          src="/logo.svg"
+          alt="Logo de josevitola.net"
+          width={80}
+          height={15}
+          priority
+        />
+      </a>
       <div className="space-x-6">
         <a href="/" className="hover:text-gray-400">
           Inicio

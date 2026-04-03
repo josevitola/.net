@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { Canvas } from '@/app/components';
 import { DEFAULT_BLINK_PROB, Colors } from './EyesCanvas.constants';
 import { Eye, Point } from '@/app/classes';
+import { useMousePos } from '@/app/hooks/client';
 
 interface EyesCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   eyesById: Map<string, Eye>;
@@ -20,7 +21,7 @@ const { isEditing, selectEye, selectedEye } = {
 const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
   const [mouseDown, setMouseDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [mousePos, setMousePos] = useState<Point>(new Point(width / 2, height / 2));
+  const mousePos = useMousePos();
 
   const drawBackground = useCallback(
     (ctx: CanvasRenderingContext2D) => {
@@ -107,14 +108,6 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
     [drawBackground, drawEyes],
   );
 
-  const onMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = e.target as HTMLCanvasElement;
-    const rect = canvas.getBoundingClientRect();
-    const p = new Point(e.clientX - rect.left, e.clientY - rect.top);
-
-    setMousePos(p);
-  }, []);
-
   const onMouseDown = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       setMouseDown(true);
@@ -151,7 +144,6 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
       width={width}
       height={height}
       draw={draw}
-      onMouseMove={onMouseMove}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
     ></Canvas>
