@@ -1,3 +1,4 @@
+import { Point } from '@/classes';
 import { DrawnEye } from '@/classes/DrawnEye';
 import { Eye } from '@/classes/Eye';
 
@@ -26,7 +27,12 @@ export function initializeEyes({
         y = ((2 * j - 1) * height) / (2 * cols);
 
       eyes.push(
-        new DrawnEye(x, y, radius, { lineWidth, id: `${(i - 1) * cols + j}` }),
+        new DrawnEye({
+          center: new Point(x, y),
+          pupilRadius: radius,
+          lineWidth,
+          id: `${(i - 1) * cols + j}`,
+        }),
       );
     }
   }

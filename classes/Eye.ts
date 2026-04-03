@@ -1,8 +1,6 @@
 import { Point } from './Point';
 
-export type EyeConfig = {
-  id?: string;
-};
+export type EyeConfig = Pick<Eye, 'center' | 'id' | 'pupilRadius'>;
 
 type EyeFollowConfig = {
   point: Point | undefined;
@@ -34,7 +32,7 @@ type EyelidConfig = {
 
 export abstract class Eye {
   center: Point;
-  r: number;
+  pupilRadius: number;
   theta: number = 0;
 
   id: string;
@@ -56,6 +54,8 @@ export abstract class Eye {
 
   static readonly DEFAULT_CONFIG: Required<EyeConfig> = {
     id: 'default',
+    center: new Point(0, 0),
+    pupilRadius: 0,
   };
 
   static readonly DEFAULT_EYELID_CONFIG: EyelidConfig = {
@@ -67,14 +67,14 @@ export abstract class Eye {
   static readonly MAGIC_EYELID_RADIUS_FACTOR = 0.93;
   static readonly MAGIC_CORNER_FACTOR = 1.05;
 
-  constructor(x: number, y: number, r: number, config: EyeConfig) {
-    const { id } = {
+  constructor(config: EyeConfig) {
+    const { center, id, pupilRadius } = {
       ...Eye.DEFAULT_CONFIG,
       ...config,
     };
 
-    this.center = new Point(x, y);
-    this.r = r;
+    this.center = center;
+    this.pupilRadius = pupilRadius;
 
     this.id = id;
 
@@ -84,7 +84,7 @@ export abstract class Eye {
       Eye.MAGIC_CORNER_FACTOR;
 
     this.startPoint = new Point(-eyeCornerDist, 0);
-    this.arcPoint = new Point(0, r * -2);
+    this.arcPoint = new Point(0, this.pupilRadius * -2);
     this.endPoint = new Point(eyeCornerDist, 0);
 
     this.blinking = BlinkingModes.IDLE;
@@ -98,7 +98,7 @@ export abstract class Eye {
   onDrag(mousePos: Point) {
     switch (this.dragMode) {
       case DragModes.UPPER_CENTER:
-        this.r -= mousePos.subY(this.upperCenter);
+        this.pupilRadius -= mousePos.subY(this.upperCenter);
         break;
       case DragModes.LEFT_CENTER:
         this.startPoint.x -= mousePos.x - this.leftCenter.x;
@@ -135,7 +135,7 @@ export abstract class Eye {
   }
 
   updateBlink() {
-    const { r } = this;
+    const { pupilRadius: r } = this;
     const { y } = this.arcPoint;
     const { CLOSING, IDLE, OPENING } = BlinkingModes;
 
@@ -241,9 +241,9 @@ export abstract class Eye {
     const boxPath = new Path2D();
     boxPath.rect(
       translated ? this.center.x + this.startPoint.x : this.startPoint.x,
-      translated ? this.center.y - this.r : -this.r,
+      translated ? this.center.y - this.pupilRadius : -this.pupilRadius,
       this.endPoint.x - this.startPoint.x,
-      2 * this.r,
+      2 * this.pupilRadius,
     );
     return boxPath;
   }
@@ -255,10 +255,10 @@ export abstract class Eye {
         ? this.center.x + this.startPoint.x - Eye.EXTERNAL_MARGIN
         : this.startPoint.x - Eye.EXTERNAL_MARGIN,
       translated
-        ? this.center.y - this.r - Eye.EXTERNAL_MARGIN
-        : -this.r - Eye.EXTERNAL_MARGIN,
+        ? this.center.y - this.pupilRadius - Eye.EXTERNAL_MARGIN
+        : -this.pupilRadius - Eye.EXTERNAL_MARGIN,
       this.endPoint.x - this.startPoint.x + 2 * Eye.EXTERNAL_MARGIN,
-      2 * this.r + 2 * Eye.EXTERNAL_MARGIN,
+      2 * this.pupilRadius + 2 * Eye.EXTERNAL_MARGIN,
     );
     return boxPath;
   }
@@ -268,11 +268,11 @@ export abstract class Eye {
   }
 
   protected get upperCenter() {
-    return this.center.addY(-this.r);
+    return this.center.addY(-this.pupilRadius);
   }
 
   protected get lowerCenter() {
-    return this.center.addY(this.r);
+    return this.center.addY(this.pupilRadius);
   }
 
   protected get leftCenter() {
@@ -284,19 +284,19 @@ export abstract class Eye {
   }
 
   protected get upperLeft() {
-    return this.center.addX(this.startPoint.x).addY(-this.r);
+    return this.center.addX(this.startPoint.x).addY(-this.pupilRadius);
   }
 
   protected get upperRight() {
-    return this.center.add(this.endPoint).addY(-this.r);
+    return this.center.add(this.endPoint).addY(-this.pupilRadius);
   }
 
   protected get lowerLeft() {
-    return this.center.add(this.startPoint).addY(this.r);
+    return this.center.add(this.startPoint).addY(this.pupilRadius);
   }
 
   protected get lowerRight() {
-    return this.center.add(this.endPoint).addY(this.r);
+    return this.center.add(this.endPoint).addY(this.pupilRadius);
   }
 
   protected abstract drawPupils(

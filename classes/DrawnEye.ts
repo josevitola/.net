@@ -5,7 +5,7 @@ import { Eye, EyeConfig } from './Eye';
 type DrawnEyeConfig = EyeConfig & {
   lineWidth?: number;
   color?: string;
-  id?: string;
+  id: string;
 };
 
 type EyeFollowConfig = {
@@ -30,19 +30,14 @@ type EyelidConfig = {
 };
 
 export class DrawnEye extends Eye {
-  center: Point;
-  r: number;
   theta: number = 0;
 
-  id: string;
   color: string;
   lineWidth: number;
 
   startPoint: Point;
   arcPoint: Point;
   endPoint: Point;
-
-  blinking: BlinkingModes;
 
   static readonly THETA = Math.PI / 2;
   static readonly BLINK_SPEED = 2;
@@ -52,6 +47,7 @@ export class DrawnEye extends Eye {
   static readonly INFO_FONT_SIZE = 12;
 
   static readonly DEFAULT_CONFIG: Required<DrawnEyeConfig> = {
+    ...Eye.DEFAULT_CONFIG,
     lineWidth: 5,
     color: 'orange',
     id: 'default',
@@ -66,18 +62,14 @@ export class DrawnEye extends Eye {
   static readonly MAGIC_EYELID_RADIUS_FACTOR = 0.93;
   static readonly MAGIC_CORNER_FACTOR = 1.05;
 
-  constructor(x: number, y: number, r: number, config: DrawnEyeConfig) {
-    super(x, y, r, config);
+  constructor(config: DrawnEyeConfig) {
+    super(config);
 
-    const { color, lineWidth, id } = {
+    const { color, lineWidth } = {
       ...DrawnEye.DEFAULT_CONFIG,
       ...config,
     };
 
-    this.center = new Point(x, y);
-    this.r = r;
-
-    this.id = id;
     this.color = color;
     this.lineWidth = lineWidth;
 
@@ -87,10 +79,8 @@ export class DrawnEye extends Eye {
       Eye.MAGIC_CORNER_FACTOR;
 
     this.startPoint = new Point(-eyeCornerDist, 0);
-    this.arcPoint = new Point(0, r * -2);
+    this.arcPoint = new Point(0, this.pupilRadius * -2);
     this.endPoint = new Point(eyeCornerDist, 0);
-
-    this.blinking = BlinkingModes.IDLE;
   }
 
   setupContext(ctx: CanvasRenderingContext2D) {
@@ -100,14 +90,8 @@ export class DrawnEye extends Eye {
     ctx.rotate(this.theta);
   }
 
-  startBlinking() {
-    const { IDLE, OPENING } = BlinkingModes;
-
-    if (this.blinking === IDLE) this.blinking = OPENING;
-  }
-
   updateBlink() {
-    const { r } = this;
+    const { pupilRadius: r } = this;
     const { y } = this.arcPoint;
     const { CLOSING, IDLE, OPENING } = BlinkingModes;
 
@@ -220,9 +204,9 @@ export class DrawnEye extends Eye {
     const boxPath = new Path2D();
     boxPath.rect(
       translated ? this.center.x + this.startPoint.x : this.startPoint.x,
-      translated ? this.center.y - this.r : -this.r,
+      translated ? this.center.y - this.pupilRadius : -this.pupilRadius,
       this.endPoint.x - this.startPoint.x,
-      2 * this.r,
+      2 * this.pupilRadius,
     );
     return boxPath;
   }
@@ -234,10 +218,10 @@ export class DrawnEye extends Eye {
         ? this.center.x + this.startPoint.x - Eye.EXTERNAL_MARGIN
         : this.startPoint.x - Eye.EXTERNAL_MARGIN,
       translated
-        ? this.center.y - this.r - Eye.EXTERNAL_MARGIN
-        : -this.r - Eye.EXTERNAL_MARGIN,
+        ? this.center.y - this.pupilRadius - Eye.EXTERNAL_MARGIN
+        : -this.pupilRadius - Eye.EXTERNAL_MARGIN,
       this.endPoint.x - this.startPoint.x + 2 * Eye.EXTERNAL_MARGIN,
-      2 * this.r + 2 * Eye.EXTERNAL_MARGIN,
+      2 * this.pupilRadius + 2 * Eye.EXTERNAL_MARGIN,
     );
     return boxPath;
   }
@@ -246,7 +230,7 @@ export class DrawnEye extends Eye {
     ctx: CanvasRenderingContext2D,
     followConfig: EyeFollowConfig,
   ) {
-    const { r, startPoint } = this;
+    const { pupilRadius: r, startPoint } = this;
     const { x, y } = followConfig.point ?? new Point();
 
     ctx.save();
@@ -264,7 +248,7 @@ export class DrawnEye extends Eye {
     const mapY = mapRange(
       y - this.center.y,
       [0, followConfig.windowHeight],
-      [0, this.r],
+      [0, this.pupilRadius],
     );
 
     // draw concentric circles
