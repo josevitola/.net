@@ -1,8 +1,6 @@
 import { Point } from './Point';
 
-type EyeConfig = {
-  lineWidth?: number;
-  color?: string;
+export type EyeConfig = {
   id?: string;
 };
 
@@ -40,8 +38,6 @@ export abstract class Eye {
   theta: number = 0;
 
   id: string;
-  color: string;
-  lineWidth: number;
 
   startPoint: Point;
   arcPoint: Point;
@@ -59,8 +55,6 @@ export abstract class Eye {
   static readonly INFO_FONT_SIZE = 12;
 
   static readonly DEFAULT_CONFIG: Required<EyeConfig> = {
-    lineWidth: 5,
-    color: 'orange',
     id: 'default',
   };
 
@@ -74,7 +68,7 @@ export abstract class Eye {
   static readonly MAGIC_CORNER_FACTOR = 1.05;
 
   constructor(x: number, y: number, r: number, config: EyeConfig) {
-    const { color, lineWidth, id } = {
+    const { id } = {
       ...Eye.DEFAULT_CONFIG,
       ...config,
     };
@@ -83,8 +77,6 @@ export abstract class Eye {
     this.r = r;
 
     this.id = id;
-    this.color = color;
-    this.lineWidth = lineWidth;
 
     const eyeCornerDist =
       Eye.DEFAULT_CONTOUR_RADIUS *
@@ -99,8 +91,6 @@ export abstract class Eye {
   }
 
   setupContext(ctx: CanvasRenderingContext2D) {
-    ctx.strokeStyle = this.color;
-    ctx.lineWidth = this.lineWidth;
     ctx.translate(this.center.x, this.center.y);
     ctx.rotate(this.theta);
   }

@@ -1,8 +1,8 @@
 import { arc, mapRange } from '@/utils/canvas';
 import { Point } from './Point';
-import { Eye } from './Eye';
+import { Eye, EyeConfig } from './Eye';
 
-type EyeConfig = {
+type DrawnEyeConfig = EyeConfig & {
   lineWidth?: number;
   color?: string;
   id?: string;
@@ -51,7 +51,7 @@ export class DrawnEye extends Eye {
   static readonly EXTERNAL_MARGIN = 10;
   static readonly INFO_FONT_SIZE = 12;
 
-  static readonly DEFAULT_CONFIG: Required<EyeConfig> = {
+  static readonly DEFAULT_CONFIG: Required<DrawnEyeConfig> = {
     lineWidth: 5,
     color: 'orange',
     id: 'default',
@@ -66,11 +66,11 @@ export class DrawnEye extends Eye {
   static readonly MAGIC_EYELID_RADIUS_FACTOR = 0.93;
   static readonly MAGIC_CORNER_FACTOR = 1.05;
 
-  constructor(x: number, y: number, r: number, config: EyeConfig) {
+  constructor(x: number, y: number, r: number, config: DrawnEyeConfig) {
     super(x, y, r, config);
 
     const { color, lineWidth, id } = {
-      ...Eye.DEFAULT_CONFIG,
+      ...DrawnEye.DEFAULT_CONFIG,
       ...config,
     };
 
