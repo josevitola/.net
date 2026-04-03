@@ -8,7 +8,6 @@ interface CanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
 }
 
 const Canvas = ({ draw, animation, ...rest }: CanvasProps) => {
-  console.log(rest.onMouseMove)
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawRef =
     useRef<(ctx: CanvasRenderingContext2D, frameCount: number) => void>(draw);

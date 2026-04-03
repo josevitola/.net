@@ -108,7 +108,6 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
   );
 
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    console.log('Mouse move', e.clientX, e.clientY);
     const canvas = e.target as HTMLCanvasElement;
     const rect = canvas.getBoundingClientRect();
     const p = new Point(e.clientX - rect.left, e.clientY - rect.top);

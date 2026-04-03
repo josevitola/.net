@@ -29,7 +29,7 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${imFellDWPica.variable} h-full antialiased`}
     >
-      <body className="relative min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col">
         <Navbar />
         {children}
       </body>
