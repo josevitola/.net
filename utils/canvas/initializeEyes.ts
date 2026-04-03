@@ -1,3 +1,4 @@
+import { DrawnEye } from '@/classes/DrawnEye';
 import { Eye } from '@/classes/Eye';
 
 interface InitializeEyesParams {
@@ -25,7 +26,7 @@ export function initializeEyes({
         y = ((2 * j - 1) * height) / (2 * cols);
 
       eyes.push(
-        new Eye(x, y, radius, { lineWidth, id: `${(i - 1) * cols + j}` }),
+        new DrawnEye(x, y, radius, { lineWidth, id: `${(i - 1) * cols + j}` }),
       );
     }
   }

@@ -1,4 +1,6 @@
+import { arc, mapRange } from '@/utils/canvas';
 import { Point } from './Point';
+import { Eye } from './Eye';
 
 type EyeConfig = {
   lineWidth?: number;
@@ -18,13 +20,6 @@ enum BlinkingModes {
   CLOSING = 'CLOSING',
 }
 
-enum DragModes {
-  UPPER_CENTER = 'UPPER_CENTER',
-  LEFT_CENTER = 'LEFT_CENTER',
-  RIGHT_CENTER = 'RIGHT_CENTER',
-  BODY = 'BODY',
-}
-
 enum LidDirections {
   UP = 'UP',
   DOWN = 'DOWN',
@@ -34,7 +29,7 @@ type EyelidConfig = {
   dir: LidDirections;
 };
 
-export abstract class Eye {
+export class DrawnEye extends Eye {
   center: Point;
   r: number;
   theta: number = 0;
@@ -48,8 +43,6 @@ export abstract class Eye {
   endPoint: Point;
 
   blinking: BlinkingModes;
-
-  dragMode?: DragModes;
 
   static readonly THETA = Math.PI / 2;
   static readonly BLINK_SPEED = 2;
@@ -74,6 +67,8 @@ export abstract class Eye {
   static readonly MAGIC_CORNER_FACTOR = 1.05;
 
   constructor(x: number, y: number, r: number, config: EyeConfig) {
+    super(x, y, r, config);
+
     const { color, lineWidth, id } = {
       ...Eye.DEFAULT_CONFIG,
       ...config,
@@ -105,39 +100,6 @@ export abstract class Eye {
     ctx.rotate(this.theta);
   }
 
-  onDrag(mousePos: Point) {
-    switch (this.dragMode) {
-      case DragModes.UPPER_CENTER:
-        this.r -= mousePos.subY(this.upperCenter);
-        break;
-      case DragModes.LEFT_CENTER:
-        this.startPoint.x -= mousePos.x - this.leftCenter.x;
-        break;
-      case DragModes.RIGHT_CENTER:
-        this.endPoint.x -= mousePos.x - this.rightCenter.x;
-        break;
-      case DragModes.BODY:
-        this.center = mousePos;
-        break;
-    }
-  }
-
-  onDragStart(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    if (this.upperCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.UPPER_CENTER;
-    } else if (this.leftCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.LEFT_CENTER;
-    } else if (this.rightCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.RIGHT_CENTER;
-    } else if (this.isHovered(ctx, mousePos)) {
-      this.dragMode = DragModes.BODY;
-    }
-  }
-
-  onDragEnd() {
-    this.dragMode = undefined;
-  }
-
   startBlinking() {
     const { IDLE, OPENING } = BlinkingModes;
 
@@ -158,10 +120,21 @@ export abstract class Eye {
     }
   }
 
-  abstract draw(
-    ctx: CanvasRenderingContext2D,
-    followConfig?: EyeFollowConfig,
-  ): void;
+  draw(ctx: CanvasRenderingContext2D, followConfig?: EyeFollowConfig) {
+    ctx.save();
+
+    this.setupContext(ctx);
+
+    this.drawContour(ctx);
+    this.drawPupils(ctx, {
+      point: new Point(0, 0),
+      windowHeight: 2,
+      windowWidth: 2,
+      ...followConfig,
+    });
+
+    ctx.restore();
+  }
 
   drawBoxes(ctx: CanvasRenderingContext2D, mousePos: Point) {
     this.drawExternalBox(ctx);
@@ -213,10 +186,6 @@ export abstract class Eye {
     ctx.stroke(this.getExternalBoxPath(false));
 
     ctx.restore();
-  }
-
-  protected get corners() {
-    return [this.upperLeft, this.upperRight, this.lowerLeft, this.lowerRight];
   }
 
   updateCursor(ctx: CanvasRenderingContext2D, mousePos: Point) {
@@ -273,44 +242,62 @@ export abstract class Eye {
     return boxPath;
   }
 
-  protected get vectors() {
-    return [this.upperCenter, this.leftCenter, this.rightCenter];
-  }
-
-  protected get upperCenter() {
-    return this.center.addY(-this.r);
-  }
-
-  protected get lowerCenter() {
-    return this.center.addY(this.r);
-  }
-
-  protected get leftCenter() {
-    return this.center.add(this.startPoint);
-  }
-
-  protected get rightCenter() {
-    return this.center.add(this.endPoint);
-  }
-
-  protected get upperLeft() {
-    return this.center.addX(this.startPoint.x).addY(-this.r);
-  }
-
-  protected get upperRight() {
-    return this.center.add(this.endPoint).addY(-this.r);
-  }
-
-  protected get lowerLeft() {
-    return this.center.add(this.startPoint).addY(this.r);
-  }
-
-  protected get lowerRight() {
-    return this.center.add(this.endPoint).addY(this.r);
-  }
-
-  protected abstract drawPupils(
+  protected drawPupils(
     ctx: CanvasRenderingContext2D,
     followConfig: EyeFollowConfig,
-  ): void;
+  ) {
+    const { r, startPoint } = this;
+    const { x, y } = followConfig.point ?? new Point();
+
+    ctx.save();
+    ctx.resetTransform();
+    ctx.translate(this.center.x, this.center.y);
+
+    const mapX =
+      -1 *
+      mapRange(
+        x - this.center.x,
+        [0, followConfig.windowWidth],
+        [0, startPoint.x],
+      );
+
+    const mapY = mapRange(
+      y - this.center.y,
+      [0, followConfig.windowHeight],
+      [0, this.r],
+    );
+
+    // draw concentric circles
+    [...new Array(Eye.NUM_PUPILS).keys()].forEach((i) => {
+      const logFactor = Math.log(i + 2) / Math.log(Eye.NUM_PUPILS + 1);
+      arc(ctx, mapX, mapY, r * logFactor, 0, Math.PI * 2);
+    });
+
+    arc(ctx, mapX, mapY, r * 0.1, 0, 2 * Math.PI);
+    ctx.restore();
+  }
+
+  private drawContour(ctx: CanvasRenderingContext2D) {
+    ctx.beginPath();
+    this.drawContourArc(ctx);
+    ctx.rotate(Math.PI);
+    this.drawContourArc(ctx);
+    ctx.clip();
+    ctx.stroke();
+    ctx.closePath();
+    ctx.rotate(Math.PI);
+  }
+
+  private drawContourArc(ctx: CanvasRenderingContext2D) {
+    const { startPoint, arcPoint, endPoint } = this;
+    ctx.moveTo(startPoint.x, startPoint.y);
+    ctx.arcTo(
+      arcPoint.x,
+      arcPoint.y,
+      endPoint.x,
+      endPoint.y,
+      Eye.DEFAULT_CONTOUR_RADIUS * Eye.MAGIC_EYELID_RADIUS_FACTOR,
+    );
+    ctx.lineTo(endPoint.x, endPoint.y);
+  }
 }
