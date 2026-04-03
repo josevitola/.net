@@ -1,4 +1,4 @@
-import { arc, mapRange } from '@/app/utils/canvas';
+import { arc, mapRange } from '@/utils/canvas';
 import { Point } from './Point';
 
 type EyeConfig = {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Point } from "@/app/classes";
+import { Point } from "@/classes";
 import { useEffect, useState } from "react";
 
 export function useMousePos(): Point {

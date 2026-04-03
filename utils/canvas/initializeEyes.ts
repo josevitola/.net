@@ -1,4 +1,4 @@
-import { Eye } from '@/app/classes/Eye';
+import { Eye } from '@/classes/Eye';
 
 interface InitializeEyesParams {
   width: number;

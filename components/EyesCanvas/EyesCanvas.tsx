@@ -1,10 +1,10 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Canvas } from '@/app/components';
+import { Canvas } from '@/components';
 import { DEFAULT_BLINK_PROB, Colors } from './EyesCanvas.constants';
-import { Eye, Point } from '@/app/classes';
-import { useMousePos } from '@/app/hooks/client';
+import { Eye, Point } from '@/classes';
+import { useMousePos } from '@/hooks/client';
 
 interface EyesCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   eyesById: Map<string, Eye>;
