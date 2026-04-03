@@ -1,3 +1,3 @@
-export * from './Button';
+export * from './LinkButton';
 export * from './Canvas';
 export * from './Navbar';
