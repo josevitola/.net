@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // disables server-side rendering and generates static HTML files for each page -- curse you Hostinger!
+  output: 'export',
 };
 
 export default nextConfig;

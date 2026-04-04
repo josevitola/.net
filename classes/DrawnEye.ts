@@ -1,11 +1,6 @@
 import { arc, mapRange } from '@/utils/canvas';
 import { Point } from './Point';
-import {
-  BlinkingModes,
-  AbstractEye,
-  BasicEyeConfig,
-  DragModes,
-} from './AbstractEye';
+import { BlinkingModes, AbstractEye, BasicEyeConfig } from './AbstractEye';
 
 type DrawnEyeConfig = BasicEyeConfig & {
   lineWidth?: number;
