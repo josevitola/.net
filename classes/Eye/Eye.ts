@@ -1,7 +1,8 @@
+import { picoid } from '@/utils/random';
 import { Point } from '../Point';
 import { mapRange } from '@/utils/math';
 
-export type EssentialEyeProps = Pick<Eye, 'center' | 'id' | 'pupilRadius'>;
+export type EssentialEyeProps = Pick<Eye, 'center' | 'pupilRadius'>;
 
 export type EyeProps = EssentialEyeProps & Pick<Eye, 'width' | 'height'>;
 
@@ -41,7 +42,7 @@ export abstract class Eye {
   width: number;
   height: number;
 
-  id: string;
+  id = picoid();
 
   blinking: BlinkingModes;
 
@@ -55,7 +56,6 @@ export abstract class Eye {
   static readonly INFO_FONT_SIZE = 12;
 
   static readonly DEFAULT_ABSTRACT_CONFIG: Required<EyeProps> = {
-    id: 'default',
     center: new Point(0, 0),
     pupilRadius: 0,
     width: 0,
@@ -67,7 +67,7 @@ export abstract class Eye {
   };
 
   constructor(config: EyeProps) {
-    const { center, id, pupilRadius, width, height } = {
+    const { center, pupilRadius, width, height } = {
       ...Eye.DEFAULT_ABSTRACT_CONFIG,
       ...config,
     };
@@ -76,8 +76,6 @@ export abstract class Eye {
     this.pupilRadius = pupilRadius;
     this.width = width;
     this.height = height;
-
-    this.id = id;
 
     this.blinking = BlinkingModes.IDLE;
   }

@@ -9,7 +9,7 @@ import { useMousePos } from '@/hooks/client';
 import useGlobalContext from '@/hooks/client/useGlobalContext/useGlobalContext';
 
 interface EyesCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
-  eyesById: Map<string, Eye>;
+  eyeList: Eye[];
   width: number;
   height: number;
 }
@@ -19,7 +19,7 @@ const { selectEye, selectedEye } = {
   selectEye: (eye: Eye | null) => { },
 }
 
-const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
+const EyesCanvas = ({ eyeList, height, width, ...rest }: EyesCanvasProps) => {
   const [mouseDown, setMouseDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const mousePos = useMousePos();
@@ -69,7 +69,7 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
     (ctx: CanvasRenderingContext2D, frame: number) => {
       let hovered = false;
 
-      eyesById.forEach((eye) => {
+      eyeList.forEach((eye) => {
         if (frame > 50) {
           if (Math.random() < DEFAULT_BLINK_PROB) {
             eye.startBlinking();
@@ -99,7 +99,7 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
         ctx.canvas.style.cursor = '';
       }
     },
-    [eyesById, mousePos, height, width, isEditing],
+    [eyeList, mousePos, height, width, isEditing],
   );
 
   const draw = useCallback(
@@ -124,7 +124,7 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
 
       let selectedEye = null;
 
-      eyesById.forEach((eye) => {
+      eyeList.forEach((eye) => {
         if (eye.isHovered(canvas.getContext('2d')!, p)) {
           selectedEye = eye;
         }
@@ -132,7 +132,7 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
 
       selectEye(selectedEye);
     },
-    [eyesById, selectEye],
+    [eyeList, selectEye],
   );
 
   const onMouseUp = useCallback(() => {

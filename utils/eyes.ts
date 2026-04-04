@@ -1,4 +1,5 @@
 import { DrawnEye, ImageEye, Point } from '@/classes';
+import { EyeAsset } from '@/types/eyes';
 
 interface InitializeEyesParams {
   width: number;
@@ -27,7 +28,6 @@ export function generateDrawnEyes({
           center: new Point(x, y),
           pupilRadius: radius,
           lineWidth,
-          id: `${(i - 1) * cols + j}`,
         }),
       );
     }
@@ -62,8 +62,75 @@ export function initializeImageEyes({
       corneaImage,
       pupilImage,
       center: new Point(width / 2, height / 2),
-      id: '1',
       pupilRadius: 30,
     }),
   ];
+}
+
+export function chaoticallyCreateRandomEyes({
+  assets,
+  count,
+  width,
+  height,
+}: {
+  assets: EyeAsset[];
+  count: number;
+  width: number;
+  height: number;
+}): ImageEye[] {
+  const eyes: ImageEye[] = [];
+  for (let i = 0; i < count; i++) {
+    const asset = assets[Math.floor(Math.random() * assets.length)];
+    eyes.push(
+      new ImageEye({
+        corneaImage: asset.cornea,
+        pupilImage: asset.pupil,
+        center: new Point(Math.random() * width, Math.random() * height),
+        pupilRadius: 30,
+      }),
+    );
+  }
+  return eyes;
+}
+
+export function createRandomEyes({
+  assets,
+  count,
+  width,
+  height,
+  mode,
+}: {
+  assets: EyeAsset[];
+  count: number;
+  width: number;
+  height: number;
+  mode: 'chaotic' | 'normal';
+}): ImageEye[] {
+  switch (mode) {
+    case 'chaotic':
+      return chaoticallyCreateRandomEyes({ assets, count, width, height });
+    case 'normal':
+      const eyes: ImageEye[] = [];
+      const cols = Math.ceil(Math.sqrt(count));
+      const rows = Math.ceil(count / cols);
+      const horizontalSpacing = width / (cols + 1);
+      const verticalSpacing = height / (rows + 1);
+      let eyeIndex = 0;
+      for (let i = 1; i <= rows; i++) {
+        for (let j = 1; j <= cols; j++) {
+          if (eyeIndex >= count) break;
+          const asset = assets[Math.floor(Math.random() * assets.length)];
+          eyes.push(
+            new ImageEye({
+              corneaImage: asset.cornea,
+              pupilImage: asset.pupil,
+              center: new Point(j * horizontalSpacing, i * verticalSpacing),
+              pupilRadius: 30,
+            }),
+          );
+          eyeIndex++;
+        }
+      }
+      return eyes;
+  }
 }

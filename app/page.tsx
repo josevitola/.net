@@ -3,24 +3,31 @@
 import { useMemo } from "react";
 import { EyesCanvas, LinkButton } from "../components";
 import { useViewport } from "../hooks/client";
-import { ImageEye } from "@/classes";
-import { initializeImageEyes } from "@/utils/eyes";
-import { useEyeImages } from "./hooks/useEyeImages";
+import { createRandomEyes } from "@/utils/eyes";
+import { useEyeAssets } from "./hooks/useEyeAssets";
+import { EyeAsset } from "@/types/eyes";
+import { ImageEye } from "@/classes/Eye/ImageEye";
 
 export default function Home() {
   const { width, height } = useViewport();
-  const { images, ready } = useEyeImages();
+  const { assets, ready } = useEyeAssets();
 
-  const eyes = useMemo(() => {
-    if (!ready) {
-      return new Map<string, ImageEye>();
-    }
+  const eyeList = useMemo<ImageEye[]>(() => {
+    if (!ready) return [];
 
-    return new Map<string, ImageEye>(
-      initializeImageEyes({ corneaImage: images[0].cornea.current, pupilImage: images[0].pupil.current, width, height })
-        .map((eye) => [eye.id, eye])
-    );
-  }, [width, height, ready, images]);
+    const finalAssets: EyeAsset[] = assets.map((asset) => ({
+      cornea: asset.cornea.current!,
+      pupil: asset.pupil.current!,
+    }));
+
+    return createRandomEyes({
+      count: 20,
+      assets: finalAssets,
+      width,
+      height,
+      mode: 'normal'
+    });
+  }, [width, height, ready, assets]);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans">
@@ -31,7 +38,7 @@ export default function Home() {
           <LinkButton href="/projects/camaleones" className="mx-auto">Saber más</LinkButton>
         </div>
       </main>
-      <EyesCanvas className="absolute -z-10 top-0 left-0" eyesById={eyes} width={width} height={height} />
+      <EyesCanvas className="absolute -z-10 top-0 left-0" eyeList={eyeList} width={width} height={height} />
     </div>
   );
 }
