@@ -1,6 +1,6 @@
 import { Point } from '@/classes';
 import { DrawnEye } from '@/classes/DrawnEye';
-import { Eye } from '@/classes/Eye';
+import { AbstractEye } from '@/classes/AbstractEye';
 
 interface InitializeEyesParams {
   width: number;
@@ -19,7 +19,7 @@ export function initializeEyes({
   rows,
   width,
 }: InitializeEyesParams) {
-  const eyes: Eye[] = [];
+  const eyes: AbstractEye[] = [];
 
   for (let i = 1; i < rows + 1; i++) {
     for (let j = 1; j < cols + 1; j++) {

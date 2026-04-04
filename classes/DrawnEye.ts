@@ -1,6 +1,11 @@
 import { arc, mapRange } from '@/utils/canvas';
 import { Point } from './Point';
-import { BlinkingModes, Eye, BasicEyeConfig, DragModes } from './Eye';
+import {
+  BlinkingModes,
+  AbstractEye,
+  BasicEyeConfig,
+  DragModes,
+} from './AbstractEye';
 
 type DrawnEyeConfig = BasicEyeConfig & {
   lineWidth?: number;
@@ -14,7 +19,7 @@ type EyeFollowConfig = {
   windowHeight: number;
 };
 
-export class DrawnEye extends Eye {
+export class DrawnEye extends AbstractEye {
   color: string;
   lineWidth: number;
 
@@ -23,7 +28,7 @@ export class DrawnEye extends Eye {
   endPoint: Point;
 
   static readonly DEFAULT_CONFIG: Required<DrawnEyeConfig> = {
-    ...Eye.DEFAULT_CONFIG,
+    ...AbstractEye.DEFAULT_CONFIG,
     lineWidth: 5,
     color: 'orange',
     id: 'default',
@@ -37,13 +42,13 @@ export class DrawnEye extends Eye {
   constructor(config: DrawnEyeConfig) {
     const eyeCornerDist =
       DrawnEye.DEFAULT_CONTOUR_RADIUS *
-      Math.sin(Eye.DEFAULT_INCLINATION / 2) *
+      Math.sin(AbstractEye.DEFAULT_INCLINATION / 2) *
       DrawnEye.MAGIC_CORNER_FACTOR;
 
     super({
       ...config,
-      width: eyeCornerDist,
-      height: config.pupilRadius,
+      width: eyeCornerDist * 2,
+      height: config.pupilRadius * 2,
     });
 
     const { color, lineWidth } = {
@@ -72,10 +77,10 @@ export class DrawnEye extends Eye {
     const { CLOSING, IDLE, OPENING } = BlinkingModes;
 
     if (this.blinking === OPENING) {
-      if (y < 0) this.arcPoint.y += Eye.BLINK_SPEED;
+      if (y < 0) this.arcPoint.y += AbstractEye.BLINK_SPEED;
       else this.blinking = CLOSING;
     } else if (this.blinking === CLOSING) {
-      if (Math.abs(y) <= r * 2) this.arcPoint.y -= Eye.BLINK_SPEED;
+      if (Math.abs(y) <= r * 2) this.arcPoint.y -= AbstractEye.BLINK_SPEED;
       else this.blinking = IDLE;
     }
   }
@@ -122,8 +127,8 @@ export class DrawnEye extends Eye {
     );
 
     // draw concentric circles
-    [...new Array(Eye.NUM_PUPILS).keys()].forEach((i) => {
-      const logFactor = Math.log(i + 2) / Math.log(Eye.NUM_PUPILS + 1);
+    [...new Array(AbstractEye.NUM_PUPILS).keys()].forEach((i) => {
+      const logFactor = Math.log(i + 2) / Math.log(AbstractEye.NUM_PUPILS + 1);
       arc(ctx, mapX, mapY, r * logFactor, 0, Math.PI * 2);
     });
 
@@ -186,124 +191,5 @@ export class DrawnEye extends Eye {
 
   onDragEnd() {
     this.dragMode = undefined;
-  }
-
-  isHovered(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    return ctx.isPointInPath(this.getExternalBoxPath(), mousePos.x, mousePos.y);
-  }
-
-  updateCursor(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    let cursor = '';
-    if (this.upperLeft.isHovered(mousePos)) {
-      cursor = 'url("/cursors/curved-arrow.png") 8 8, auto';
-    } else if (this.upperRight.isHovered(mousePos)) {
-      cursor = 'url("/cursors/curved-arrow-90.png") 8 8, auto';
-    } else if (this.lowerLeft.isHovered(mousePos)) {
-      cursor = 'url("/cursors/curved-arrow-270.png") 8 8, auto';
-    } else if (this.lowerRight.isHovered(mousePos)) {
-      cursor = 'url("/cursors/curved-arrow-180.png") 8 8, auto';
-    } else if (this.upperCenter.isHovered(mousePos)) {
-      cursor = 'n-resize';
-    } else if (this.leftCenter.isHovered(mousePos)) {
-      cursor = 'w-resize';
-    } else if (this.rightCenter.isHovered(mousePos)) {
-      cursor = 'e-resize';
-    } else if (this.isHovered(ctx, mousePos)) {
-      cursor = 'grab';
-    }
-    ctx.canvas.style.cursor = cursor;
-  }
-
-  drawBoxes(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    this.drawExternalBox(ctx);
-    this.drawInternalBox(ctx);
-    this.vectors.forEach((corner) => {
-      corner.draw(ctx, mousePos, { coordinates: false });
-    });
-    this.corners.forEach((corner) => {
-      corner.draw(ctx, mousePos, { coordinates: false });
-    });
-  }
-
-  drawInternalBox(ctx: CanvasRenderingContext2D) {
-    ctx.save();
-    ctx.setLineDash([7, 7]);
-    ctx.translate(this.center.x, this.center.y);
-    ctx.rotate(this.inclination);
-    ctx.strokeStyle = 'white';
-    ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
-    ctx.fill(this.getBoxPath(false));
-    ctx.stroke(this.getBoxPath(false));
-    ctx.restore();
-  }
-
-  drawExternalBox(ctx: CanvasRenderingContext2D) {
-    ctx.save();
-    ctx.setLineDash([7, 7]);
-    ctx.translate(this.center.x, this.center.y);
-    ctx.rotate(this.inclination);
-    ctx.strokeStyle = 'white';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.fill(this.getExternalBoxPath(false));
-    ctx.stroke(this.getExternalBoxPath(false));
-    ctx.restore();
-  }
-
-  getBoxPath(translated: boolean = true) {
-    const boxPath = new Path2D();
-    boxPath.rect(
-      translated ? this.center.x + this.startPoint.x : this.startPoint.x,
-      translated ? this.center.y - this.pupilRadius : -this.pupilRadius,
-      this.endPoint.x - this.startPoint.x,
-      2 * this.pupilRadius,
-    );
-    return boxPath;
-  }
-
-  getExternalBoxPath(translated: boolean = true) {
-    const boxPath = new Path2D();
-    boxPath.rect(
-      translated
-        ? this.center.x + this.startPoint.x - Eye.EXTERNAL_MARGIN
-        : this.startPoint.x - Eye.EXTERNAL_MARGIN,
-      translated
-        ? this.center.y - this.pupilRadius - Eye.EXTERNAL_MARGIN
-        : -this.pupilRadius - Eye.EXTERNAL_MARGIN,
-      this.endPoint.x - this.startPoint.x + 2 * Eye.EXTERNAL_MARGIN,
-      2 * this.pupilRadius + 2 * Eye.EXTERNAL_MARGIN,
-    );
-    return boxPath;
-  }
-
-  protected get corners() {
-    return [this.upperLeft, this.upperRight, this.lowerLeft, this.lowerRight];
-  }
-
-  protected get vectors() {
-    return [this.upperCenter, this.leftCenter, this.rightCenter];
-  }
-
-  protected get leftCenter() {
-    return this.center.add(this.startPoint);
-  }
-
-  protected get rightCenter() {
-    return this.center.add(this.endPoint);
-  }
-
-  protected get upperLeft() {
-    return this.center.addX(this.startPoint.x).addY(-this.pupilRadius);
-  }
-
-  protected get upperRight() {
-    return this.center.add(this.endPoint).addY(-this.pupilRadius);
-  }
-
-  protected get lowerLeft() {
-    return this.center.add(this.startPoint).addY(this.pupilRadius);
-  }
-
-  protected get lowerRight() {
-    return this.center.add(this.endPoint).addY(this.pupilRadius);
   }
 }

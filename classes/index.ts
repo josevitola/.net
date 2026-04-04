@@ -1,2 +1,2 @@
-export * from './Eye';
+export * from './AbstractEye';
 export * from './Point';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from "react";
-import { Eye } from "../classes";
+import { AbstractEye } from "../classes";
 import { LinkButton } from "../components";
 import { EyesCanvas } from "../components/EyesCanvas";
 import { useViewport } from "../hooks/client";
@@ -11,7 +11,7 @@ export default function Home() {
   const { width, height } = useViewport();
 
   const eyes = useMemo(() => {
-    return new Map<string, Eye>(getDefaultEyes({ width, height }).map((eye) => [eye.id, eye]));
+    return new Map<string, AbstractEye>(getDefaultEyes({ width, height }).map((eye) => [eye.id, eye]));
   }, [width, height]);
 
   return (

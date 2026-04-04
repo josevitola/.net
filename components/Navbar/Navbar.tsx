@@ -20,6 +20,9 @@ export function Navbar() {
         />
       </a>
       <div className="space-x-6">
+        <button className="font-serif h-6 justify-center gap-2 rounded-full bg-foreground px-3 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]">
+          Editar
+        </button>
         <a href="/" className="hover:text-gray-400">
           Inicio
         </a>
