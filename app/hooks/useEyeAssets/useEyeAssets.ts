@@ -1,9 +1,9 @@
+import { ControlledImage } from '@/classes';
 import { useImage } from '@/hooks/client';
-import { EyeAsset } from '@/types/eyes';
 import { useMemo } from 'react';
 
-export function useEyeAssets(): {
-  assets: EyeAsset[];
+export function useEyeControlledImages(): {
+  assets: { cornea: ControlledImage; pupil: ControlledImage }[];
   ready: boolean;
 } {
   const { image: cornea1, ready: cornea1Rdy } = useImage({ path: '/cornea1.png' });
@@ -19,8 +19,14 @@ export function useEyeAssets(): {
   const assets = useMemo(() => {
     if (!ready) return [];
     return [
-      { cornea: cornea1.current!, pupil: pupil1.current! },
-      { cornea: cornea2.current!, pupil: pupil2.current! },
+      {
+        cornea: new ControlledImage(cornea1.current!),
+        pupil: new ControlledImage(pupil1.current!),
+      },
+      {
+        cornea: new ControlledImage(cornea2.current!),
+        pupil: new ControlledImage(pupil2.current!),
+      },
     ];
   }, [cornea1, pupil1, cornea2, pupil2, ready]);
 

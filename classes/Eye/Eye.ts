@@ -272,15 +272,19 @@ export abstract class Eye {
 
   protected calculatePupilPosition(followConfig: EyeFollowConfig) {
     const { x, y } = followConfig.follow ?? new Point();
-    return {
-      x:
-        -1 *
-        mapRange(
-          x - this.center.x,
-          [0, followConfig.windowWidth],
-          [0, this.width / 2 - this.pupilRadius],
-        ),
-      y: mapRange(y - this.center.y, [0, followConfig.windowHeight], [0, this.pupilRadius]),
-    };
+
+    const mappedX = mapRange(
+      x - this.center.x,
+      [0, followConfig.windowWidth / 2],
+      [0, this.width / 2 - this.pupilRadius],
+    );
+
+    const mappedY = mapRange(
+      y - this.center.y,
+      [0, followConfig.windowHeight / 2],
+      [0, this.pupilRadius],
+    );
+
+    return { x: mappedX, y: mappedY };
   }
 }

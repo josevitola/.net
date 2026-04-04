@@ -4,14 +4,13 @@ import { useMemo } from "react";
 import { EyesCanvas, LinkButton } from "../components";
 import { useViewport } from "../hooks/client";
 import { createRandomEyes } from "@/utils/eyes";
-import { useEyeAssets } from "./hooks/useEyeAssets";
-import { EyeAsset } from "@/types/eyes";
+import { useEyeControlledImages } from "./hooks/useEyeAssets";
 import { ImageEye } from "@/classes/Eye/ImageEye";
 import { Point } from "@/classes/Point";
 
 export default function Home() {
   const { width, height } = useViewport();
-  const { assets, ready } = useEyeAssets();
+  const { assets, ready } = useEyeControlledImages();
 
   const eyeList = useMemo<ImageEye[]>(() => {
     if (!ready) return [];
@@ -23,6 +22,9 @@ export default function Home() {
     //   height,
     //   mode: 'normal'
     // });
+
+    assets[0].cornea.width = 200;
+    assets[0].pupil.width = 40;
 
     return [new ImageEye({
       cornea: assets[0].cornea,

@@ -1,5 +1,5 @@
 import { DrawnEye, ImageEye, Point } from '@/classes';
-import { EyeAsset } from '@/types/eyes';
+import { EyeAsset } from '@/types/assets';
 
 interface InitializeEyesParams {
   width: number;

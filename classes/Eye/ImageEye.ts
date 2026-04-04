@@ -1,20 +1,20 @@
+import { ControlledImage } from '../ControlledImage';
 import { Eye, EyeFollowConfig, EssentialEyeProps } from './Eye';
 
 type ImageEyeConfig = EssentialEyeProps & Pick<ImageEye, 'cornea' | 'pupil'>;
 
 export class ImageEye extends Eye {
-  cornea: HTMLImageElement;
-  pupil: HTMLImageElement;
+  cornea: ControlledImage;
+  pupil: ControlledImage;
 
-  constructor({ cornea: corneaImage, pupil: pupilImage, ...rest }: ImageEyeConfig) {
-    super({
-      ...rest,
-      width: corneaImage.width,
-      height: corneaImage.height,
-    });
+  constructor({ cornea, pupil, ...rest }: ImageEyeConfig) {
+    const width = cornea.width ?? cornea.img.width;
+    const height = (width / cornea.img.width) * cornea.img.height;
 
-    this.cornea = corneaImage;
-    this.pupil = pupilImage;
+    super({ ...rest, width, height });
+
+    this.cornea = cornea;
+    this.pupil = pupil;
   }
 
   updateBlink() {
@@ -22,8 +22,8 @@ export class ImageEye extends Eye {
   }
 
   protected drawContour(ctx: CanvasRenderingContext2D) {
-    if (this.cornea.complete) {
-      ctx.drawImage(this.cornea, -this.width / 2, -this.height / 2, this.width, this.height);
+    if (this.cornea.img.complete) {
+      ctx.drawImage(this.cornea.img, -this.width / 2, -this.height / 2, this.width, this.height);
     }
   }
 
@@ -33,6 +33,6 @@ export class ImageEye extends Eye {
 
     ctx.resetTransform();
     ctx.translate(this.center.x - pupilWidth / 2, this.center.y - pupilHeight / 2);
-    ctx.drawImage(this.pupil, -pupilX, pupilY, pupilWidth, pupilHeight);
+    ctx.drawImage(this.pupil.img, pupilX, pupilY, pupilWidth, pupilHeight);
   }
 }
