@@ -7,6 +7,7 @@ import { createRandomEyes } from "@/utils/eyes";
 import { useEyeAssets } from "./hooks/useEyeAssets";
 import { EyeAsset } from "@/types/eyes";
 import { ImageEye } from "@/classes/Eye/ImageEye";
+import { Point } from "@/classes/Point";
 
 export default function Home() {
   const { width, height } = useViewport();
@@ -15,18 +16,21 @@ export default function Home() {
   const eyeList = useMemo<ImageEye[]>(() => {
     if (!ready) return [];
 
-    const finalAssets: EyeAsset[] = assets.map((asset) => ({
-      cornea: asset.cornea.current!,
-      pupil: asset.pupil.current!,
-    }));
+    // return createRandomEyes({
+    //   count: 20,
+    //   assets: finalAssets,
+    //   width,
+    //   height,
+    //   mode: 'normal'
+    // });
 
-    return createRandomEyes({
-      count: 20,
-      assets: finalAssets,
-      width,
-      height,
-      mode: 'normal'
-    });
+    return [new ImageEye({
+      cornea: assets[0].cornea,
+      pupil: assets[0].pupil,
+      center: new Point(width / 2, height / 2),
+      pupilRadius: 30,
+    })
+    ]
   }, [width, height, ready, assets]);
 
   return (

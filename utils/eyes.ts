@@ -59,8 +59,8 @@ export function initializeImageEyes({
   if (!corneaImage || !pupilImage) return [];
   return [
     new ImageEye({
-      corneaImage,
-      pupilImage,
+      cornea: corneaImage,
+      pupil: pupilImage,
       center: new Point(width / 2, height / 2),
       pupilRadius: 30,
     }),
@@ -83,8 +83,8 @@ export function chaoticallyCreateRandomEyes({
     const asset = assets[Math.floor(Math.random() * assets.length)];
     eyes.push(
       new ImageEye({
-        corneaImage: asset.cornea,
-        pupilImage: asset.pupil,
+        cornea: asset.cornea,
+        pupil: asset.pupil,
         center: new Point(Math.random() * width, Math.random() * height),
         pupilRadius: 30,
       }),
@@ -122,8 +122,8 @@ export function createRandomEyes({
           const asset = assets[Math.floor(Math.random() * assets.length)];
           eyes.push(
             new ImageEye({
-              corneaImage: asset.cornea,
-              pupilImage: asset.pupil,
+              cornea: asset.cornea,
+              pupil: asset.pupil,
               center: new Point(j * horizontalSpacing, i * verticalSpacing),
               pupilRadius: 30,
             }),
