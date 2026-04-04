@@ -1,6 +1,5 @@
 import { Point } from '@/classes';
-import { DrawnEye } from '@/classes/DrawnEye';
-import { AbstractEye } from '@/classes/AbstractEye';
+import { Eye, DrawnEye, ImageEye } from '@/components/EyesCanvas/classes';
 
 interface InitializeEyesParams {
   width: number;
@@ -11,15 +10,15 @@ interface InitializeEyesParams {
   lineWidth: number;
 }
 
-export function initializeEyes({
+export function initializeDrawnEyes({
   cols,
   height,
   lineWidth,
   radius,
   rows,
   width,
-}: InitializeEyesParams) {
-  const eyes: AbstractEye[] = [];
+}: InitializeEyesParams): Eye[] {
+  const eyes: Eye[] = [];
 
   for (let i = 1; i < rows + 1; i++) {
     for (let j = 1; j < cols + 1; j++) {
@@ -40,14 +39,8 @@ export function initializeEyes({
   return eyes;
 }
 
-export function getDefaultEyes({
-  width,
-  height,
-}: {
-  width: number;
-  height: number;
-}) {
-  return initializeEyes({
+export function getDefaultEyes({ width, height }: { width: number; height: number }) {
+  return initializeDrawnEyes({
     width,
     height,
     cols: 3,
@@ -55,4 +48,27 @@ export function getDefaultEyes({
     lineWidth: 2,
     radius: 30,
   });
+}
+
+export function initializeImageEyes({
+  corneaImage,
+  pupilImage,
+  width,
+  height,
+}: {
+  corneaImage: HTMLImageElement | null;
+  pupilImage: HTMLImageElement | null;
+  width: number;
+  height: number;
+}) {
+  if (!corneaImage || !pupilImage) return [];
+  return [
+    new ImageEye({
+      corneaImage,
+      pupilImage,
+      center: new Point(width / 2, height / 2),
+      id: '1',
+      pupilRadius: 30,
+    }),
+  ];
 }

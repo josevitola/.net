@@ -6,6 +6,8 @@ const imFellDWPica = IM_Fell_DW_Pica({
   weight: "400",
 });
 
+const isDev = process.env.NODE_ENV === "development";
+
 export function Navbar() {
   return (
     <nav className={`${imFellDWPica.className} w-full h-20 text-white flex items-center justify-between py-4 px-10`}>
@@ -20,7 +22,8 @@ export function Navbar() {
         />
       </a>
       <div className="space-x-6">
-        <button className="font-serif h-6 justify-center gap-2 rounded-full bg-foreground px-3 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]">
+        <button className={`${isDev ? "inline-block" : "hidden"
+          } font-serif h-6 justify-center gap-2 rounded-full bg-foreground px-3 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]`}>
           Editar
         </button>
         <a href="/" className="hover:text-gray-400">

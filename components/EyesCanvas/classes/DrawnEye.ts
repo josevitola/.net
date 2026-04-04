@@ -1,20 +1,13 @@
-import { arc, mapRange } from '@/utils/canvas';
-import { Point } from './Point';
-import { BlinkingModes, AbstractEye, BasicEyeConfig } from './AbstractEye';
+import { arc, mapRange } from '../utils';
+import { Point } from '../../../classes/Point';
+import { BlinkingModes, Eye, EyeFollowConfig, EssentialEyeProps } from './Eye';
 
-type DrawnEyeConfig = BasicEyeConfig & {
+type DrawnEyeProps = EssentialEyeProps & {
   lineWidth?: number;
   color?: string;
-  id: string;
 };
 
-type EyeFollowConfig = {
-  point: Point | undefined;
-  windowWidth: number;
-  windowHeight: number;
-};
-
-export class DrawnEye extends AbstractEye {
+export class DrawnEye extends Eye {
   color: string;
   lineWidth: number;
 
@@ -22,8 +15,8 @@ export class DrawnEye extends AbstractEye {
   arcPoint: Point;
   endPoint: Point;
 
-  static readonly DEFAULT_CONFIG: Required<DrawnEyeConfig> = {
-    ...AbstractEye.DEFAULT_CONFIG,
+  static readonly DEFAULT_CONFIG: Required<DrawnEyeProps> = {
+    ...Eye.DEFAULT_ABSTRACT_CONFIG,
     lineWidth: 5,
     color: 'orange',
     id: 'default',
@@ -34,10 +27,10 @@ export class DrawnEye extends AbstractEye {
   static readonly MAGIC_EYELID_RADIUS_FACTOR = 0.93;
   static readonly MAGIC_CORNER_FACTOR = 1.05;
 
-  constructor(config: DrawnEyeConfig) {
+  constructor(config: DrawnEyeProps) {
     const eyeCornerDist =
       DrawnEye.DEFAULT_CONTOUR_RADIUS *
-      Math.sin(AbstractEye.DEFAULT_INCLINATION / 2) *
+      Math.sin(Eye.DEFAULT_INCLINATION / 2) *
       DrawnEye.MAGIC_CORNER_FACTOR;
 
     super({
@@ -60,10 +53,9 @@ export class DrawnEye extends AbstractEye {
   }
 
   setupContext(ctx: CanvasRenderingContext2D) {
+    super.setupContext(ctx);
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.lineWidth;
-    ctx.translate(this.center.x, this.center.y);
-    ctx.rotate(this.inclination);
   }
 
   updateBlink() {
@@ -72,34 +64,15 @@ export class DrawnEye extends AbstractEye {
     const { CLOSING, IDLE, OPENING } = BlinkingModes;
 
     if (this.blinking === OPENING) {
-      if (y < 0) this.arcPoint.y += AbstractEye.BLINK_SPEED;
+      if (y < 0) this.arcPoint.y += Eye.BLINK_SPEED;
       else this.blinking = CLOSING;
     } else if (this.blinking === CLOSING) {
-      if (Math.abs(y) <= r * 2) this.arcPoint.y -= AbstractEye.BLINK_SPEED;
+      if (Math.abs(y) <= r * 2) this.arcPoint.y -= Eye.BLINK_SPEED;
       else this.blinking = IDLE;
     }
   }
 
-  draw(ctx: CanvasRenderingContext2D, followConfig?: EyeFollowConfig) {
-    ctx.save();
-
-    this.setupContext(ctx);
-
-    this.drawContour(ctx);
-    this.drawPupils(ctx, {
-      point: new Point(0, 0),
-      windowHeight: 2,
-      windowWidth: 2,
-      ...followConfig,
-    });
-
-    ctx.restore();
-  }
-
-  protected drawPupils(
-    ctx: CanvasRenderingContext2D,
-    followConfig: EyeFollowConfig,
-  ) {
+  protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig) {
     const { pupilRadius: r, startPoint } = this;
     const { x, y } = followConfig.point ?? new Point();
 
@@ -107,23 +80,13 @@ export class DrawnEye extends AbstractEye {
     ctx.resetTransform();
     ctx.translate(this.center.x, this.center.y);
 
-    const mapX =
-      -1 *
-      mapRange(
-        x - this.center.x,
-        [0, followConfig.windowWidth],
-        [0, startPoint.x],
-      );
+    const mapX = -1 * mapRange(x - this.center.x, [0, followConfig.windowWidth], [0, startPoint.x]);
 
-    const mapY = mapRange(
-      y - this.center.y,
-      [0, followConfig.windowHeight],
-      [0, this.pupilRadius],
-    );
+    const mapY = mapRange(y - this.center.y, [0, followConfig.windowHeight], [0, this.pupilRadius]);
 
     // draw concentric circles
-    [...new Array(AbstractEye.NUM_PUPILS).keys()].forEach((i) => {
-      const logFactor = Math.log(i + 2) / Math.log(AbstractEye.NUM_PUPILS + 1);
+    [...new Array(Eye.NUM_PUPILS).keys()].forEach((i) => {
+      const logFactor = Math.log(i + 2) / Math.log(Eye.NUM_PUPILS + 1);
       arc(ctx, mapX, mapY, r * logFactor, 0, Math.PI * 2);
     });
 
@@ -131,7 +94,7 @@ export class DrawnEye extends AbstractEye {
     ctx.restore();
   }
 
-  private drawContour(ctx: CanvasRenderingContext2D) {
+  protected drawContour(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     this.drawContourArc(ctx);
     ctx.rotate(Math.PI);

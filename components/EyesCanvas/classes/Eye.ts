@@ -1,8 +1,8 @@
-import { Point } from './Point';
+import { Point } from '../../../classes/Point';
 
-export type BasicEyeConfig = Pick<AbstractEye, 'center' | 'id' | 'pupilRadius'>;
+export type EssentialEyeProps = Pick<Eye, 'center' | 'id' | 'pupilRadius'>;
 
-type AbstractEyeConfig = BasicEyeConfig & Pick<AbstractEye, 'width' | 'height'>;
+export type EyeProps = EssentialEyeProps & Pick<Eye, 'width' | 'height'>;
 
 export type EyeFollowConfig = {
   point: Point | undefined;
@@ -32,7 +32,7 @@ type EyelidConfig = {
   dir: LidDirections;
 };
 
-export abstract class AbstractEye {
+export abstract class Eye {
   center: Point;
   pupilRadius: number;
   inclination: number = 0;
@@ -53,19 +53,21 @@ export abstract class AbstractEye {
   static readonly EXTERNAL_MARGIN = 10;
   static readonly INFO_FONT_SIZE = 12;
 
-  static readonly DEFAULT_CONFIG: Required<BasicEyeConfig> = {
+  static readonly DEFAULT_ABSTRACT_CONFIG: Required<EyeProps> = {
     id: 'default',
     center: new Point(0, 0),
     pupilRadius: 0,
+    width: 0,
+    height: 0,
   };
 
   static readonly DEFAULT_EYELID_CONFIG: EyelidConfig = {
     dir: LidDirections.UP,
   };
 
-  constructor(config: AbstractEyeConfig) {
+  constructor(config: EyeProps) {
     const { center, id, pupilRadius, width, height } = {
-      ...AbstractEye.DEFAULT_CONFIG,
+      ...Eye.DEFAULT_ABSTRACT_CONFIG,
       ...config,
     };
 
@@ -79,17 +81,24 @@ export abstract class AbstractEye {
     this.blinking = BlinkingModes.IDLE;
   }
 
-  abstract draw(
-    ctx: CanvasRenderingContext2D,
-    followConfig?: EyeFollowConfig,
-  ): void;
+  draw(ctx: CanvasRenderingContext2D, followConfig?: EyeFollowConfig) {
+    ctx.save();
+    this.setupContext(ctx);
+    this.drawContour(ctx);
+    this.drawPupil(ctx, {
+      point: new Point(0, 0),
+      windowHeight: 2,
+      windowWidth: 2,
+      ...followConfig,
+    });
+    ctx.restore();
+  }
 
   abstract updateBlink(): void;
 
-  protected abstract drawPupils(
-    ctx: CanvasRenderingContext2D,
-    followConfig: EyeFollowConfig,
-  ): void;
+  protected abstract drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig): void;
+
+  protected abstract drawContour(ctx: CanvasRenderingContext2D): void;
 
   setupContext(ctx: CanvasRenderingContext2D) {
     ctx.translate(this.center.x, this.center.y);
@@ -103,24 +112,22 @@ export abstract class AbstractEye {
   }
 
   drawInfo(ctx: CanvasRenderingContext2D) {
-    ctx.font = `${AbstractEye.INFO_FONT_SIZE}px Arial`;
+    ctx.font = `${Eye.INFO_FONT_SIZE}px Arial`;
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.fillText(
       this.id,
       this.lowerCenter.x,
-      this.lowerCenter.y +
-        AbstractEye.INFO_FONT_SIZE +
-        AbstractEye.EXTERNAL_MARGIN * 1.5,
+      this.lowerCenter.y + Eye.INFO_FONT_SIZE + Eye.EXTERNAL_MARGIN * 1.5,
     );
   }
 
   protected get upperCenter() {
-    return this.center.addY(-this.pupilRadius);
+    return this.center.addY(-this.height / 2);
   }
 
   protected get lowerCenter() {
-    return this.center.addY(this.pupilRadius);
+    return this.center.addY(this.height / 2);
   }
 
   onDrag(mousePos: Point) {
@@ -202,10 +209,10 @@ export abstract class AbstractEye {
   getExternalBoxPath() {
     const boxPath = new Path2D();
     boxPath.rect(
-      this.upperLeft.x - AbstractEye.EXTERNAL_MARGIN,
-      this.upperLeft.y - AbstractEye.EXTERNAL_MARGIN,
-      this.width + 2 * AbstractEye.EXTERNAL_MARGIN,
-      this.height + 2 * AbstractEye.EXTERNAL_MARGIN,
+      this.upperLeft.x - Eye.EXTERNAL_MARGIN,
+      this.upperLeft.y - Eye.EXTERNAL_MARGIN,
+      this.width + 2 * Eye.EXTERNAL_MARGIN,
+      this.height + 2 * Eye.EXTERNAL_MARGIN,
     );
     return boxPath;
   }

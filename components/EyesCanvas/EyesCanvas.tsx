@@ -3,19 +3,20 @@
 import { useCallback, useState } from 'react';
 import { Canvas } from '@/components';
 import { DEFAULT_BLINK_PROB, Colors } from './EyesCanvas.constants';
-import { AbstractEye, Point } from '@/classes';
+import { Eye } from './classes';
+import { Point } from '@/classes';
 import { useMousePos } from '@/hooks/client';
 
 interface EyesCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
-  eyesById: Map<string, AbstractEye>;
+  eyesById: Map<string, Eye>;
   width: number;
   height: number;
 }
 
 const { isEditing, selectEye, selectedEye } = {
   isEditing: process.env.NODE_ENV === 'development',
-  selectedEye: null as AbstractEye | null,
-  selectEye: (eye: AbstractEye | null) => { },
+  selectedEye: null as Eye | null,
+  selectEye: (eye: Eye | null) => { },
 }
 
 const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
@@ -32,7 +33,7 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
   );
 
   const shouldApplyMouseEventsToEye = useCallback(
-    (ctx: CanvasRenderingContext2D, eye: AbstractEye): boolean => {
+    (ctx: CanvasRenderingContext2D, eye: Eye): boolean => {
       if (!isEditing) {
         return false;
       }

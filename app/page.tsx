@@ -1,18 +1,26 @@
 'use client';
 
 import { useMemo } from "react";
-import { AbstractEye } from "../classes";
 import { LinkButton } from "../components";
 import { EyesCanvas } from "../components/EyesCanvas";
-import { useViewport } from "../hooks/client";
-import { getDefaultEyes } from "../utils/canvas";
+import { useImage, useViewport } from "../hooks/client";
+import { initializeImageEyes, ImageEye } from "@/components/EyesCanvas";
 
 export default function Home() {
   const { width, height } = useViewport();
+  const { image: corneaImage, ready: corneaImageReady } = useImage({ path: "/cornea1.png" });
+  const { image: pupilImage, ready: pupilImageReady } = useImage({ path: "/pupil1.png" });
 
   const eyes = useMemo(() => {
-    return new Map<string, AbstractEye>(getDefaultEyes({ width, height }).map((eye) => [eye.id, eye]));
-  }, [width, height]);
+    if (!corneaImageReady || !pupilImageReady) {
+      return new Map<string, ImageEye>();
+    }
+
+    return new Map<string, ImageEye>(
+      initializeImageEyes({ corneaImage: corneaImage.current, pupilImage: pupilImage.current, width, height })
+        .map((eye) => [eye.id, eye])
+    );
+  }, [width, height, corneaImageReady, pupilImageReady]);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans">
