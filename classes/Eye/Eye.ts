@@ -6,7 +6,7 @@ export type EssentialEyeProps = Pick<Eye, 'center' | 'id' | 'pupilRadius'>;
 export type EyeProps = EssentialEyeProps & Pick<Eye, 'width' | 'height'>;
 
 export type EyeFollowConfig = {
-  point: Point | undefined;
+  follow: Point | undefined;
   windowWidth: number;
   windowHeight: number;
 };
@@ -87,7 +87,7 @@ export abstract class Eye {
     this.setupContext(ctx);
     this.drawContour(ctx);
     this.drawPupil(ctx, {
-      point: new Point(0, 0),
+      follow: new Point(0, 0),
       windowHeight: 2,
       windowWidth: 2,
       ...followConfig,
@@ -273,7 +273,7 @@ export abstract class Eye {
   }
 
   protected calculatePupilPosition(followConfig: EyeFollowConfig) {
-    const { x, y } = followConfig.point ?? new Point();
+    const { x, y } = followConfig.follow ?? new Point();
     return {
       x:
         -1 *

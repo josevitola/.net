@@ -79,7 +79,7 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
         }
 
         eye.draw(ctx, {
-          point: mousePos,
+          follow: mousePos,
           windowHeight: height,
           windowWidth: width,
         });

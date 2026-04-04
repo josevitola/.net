@@ -28,12 +28,11 @@ export class ImageEye extends Eye {
   }
 
   protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig) {
-    ctx.drawImage(
-      this.pupilImage,
-      -this.pupilRadius,
-      -this.pupilRadius,
-      this.pupilRadius * 2,
-      this.pupilRadius * 2,
-    );
+    const { x: pupilX, y: pupilY } = this.calculatePupilPosition(followConfig);
+    const { width: pupilWidth, height: pupilHeight } = this.pupilImage;
+
+    ctx.resetTransform();
+    ctx.translate(this.center.x - pupilWidth / 2, this.center.y - pupilHeight / 2);
+    ctx.drawImage(this.pupilImage, -pupilX, pupilY, pupilWidth, pupilHeight);
   }
 }

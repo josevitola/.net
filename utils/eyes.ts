@@ -9,7 +9,7 @@ interface InitializeEyesParams {
   lineWidth: number;
 }
 
-export function initializeDrawnEyes({
+export function generateDrawnEyes({
   cols,
   height,
   lineWidth,
@@ -34,8 +34,8 @@ export function initializeDrawnEyes({
   }
   return eyes;
 }
-export function getDefaultEyes({ width, height }: { width: number; height: number }) {
-  return initializeDrawnEyes({
+export function initializeDrawnEyes({ width, height }: { width: number; height: number }) {
+  return generateDrawnEyes({
     width,
     height,
     cols: 3,
