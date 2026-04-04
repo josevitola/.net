@@ -84,6 +84,8 @@ export abstract class AbstractEye {
     followConfig?: EyeFollowConfig,
   ): void;
 
+  abstract updateBlink(): void;
+
   protected abstract drawPupils(
     ctx: CanvasRenderingContext2D,
     followConfig: EyeFollowConfig,
@@ -121,6 +123,23 @@ export abstract class AbstractEye {
     return this.center.addY(this.pupilRadius);
   }
 
+  onDrag(mousePos: Point) {
+    switch (this.dragMode) {
+      case DragModes.UPPER_CENTER:
+        this.height -= mousePos.y - this.upperCenter.y;
+        break;
+      case DragModes.LEFT_CENTER:
+        this.width -= mousePos.x - this.leftCenter.x;
+        break;
+      case DragModes.RIGHT_CENTER:
+        this.width += mousePos.x - this.rightCenter.x;
+        break;
+      case DragModes.BODY:
+        this.center = mousePos;
+        break;
+    }
+  }
+
   isHovered(ctx: CanvasRenderingContext2D, mousePos: Point) {
     return ctx.isPointInPath(this.getExternalBoxPath(), mousePos.x, mousePos.y);
   }
@@ -145,6 +164,22 @@ export abstract class AbstractEye {
     ctx.fill(this.getBoxPath());
     ctx.stroke(this.getBoxPath());
     ctx.restore();
+  }
+
+  onDragStart(ctx: CanvasRenderingContext2D, mousePos: Point) {
+    if (this.upperCenter.isHovered(mousePos)) {
+      this.dragMode = DragModes.UPPER_CENTER;
+    } else if (this.leftCenter.isHovered(mousePos)) {
+      this.dragMode = DragModes.LEFT_CENTER;
+    } else if (this.rightCenter.isHovered(mousePos)) {
+      this.dragMode = DragModes.RIGHT_CENTER;
+    } else if (this.isHovered(ctx, mousePos)) {
+      this.dragMode = DragModes.BODY;
+    }
+  }
+
+  onDragEnd() {
+    this.dragMode = undefined;
   }
 
   private drawExternalBox(ctx: CanvasRenderingContext2D) {

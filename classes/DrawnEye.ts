@@ -159,37 +159,4 @@ export class DrawnEye extends AbstractEye {
     );
     ctx.lineTo(endPoint.x, endPoint.y);
   }
-
-  onDrag(mousePos: Point) {
-    switch (this.dragMode) {
-      case DragModes.UPPER_CENTER:
-        this.pupilRadius -= mousePos.subY(this.upperCenter);
-        break;
-      case DragModes.LEFT_CENTER:
-        this.startPoint.x -= mousePos.x - this.leftCenter.x;
-        break;
-      case DragModes.RIGHT_CENTER:
-        this.endPoint.x -= mousePos.x - this.rightCenter.x;
-        break;
-      case DragModes.BODY:
-        this.center = mousePos;
-        break;
-    }
-  }
-
-  onDragStart(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    if (this.upperCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.UPPER_CENTER;
-    } else if (this.leftCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.LEFT_CENTER;
-    } else if (this.rightCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.RIGHT_CENTER;
-    } else if (this.isHovered(ctx, mousePos)) {
-      this.dragMode = DragModes.BODY;
-    }
-  }
-
-  onDragEnd() {
-    this.dragMode = undefined;
-  }
 }
