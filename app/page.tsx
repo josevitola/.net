@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { EyesCanvas, LinkButton } from "../components";
 import { useViewport } from "../hooks/client";
-import { createRandomEyes } from "@/utils/eyes";
+import { generateEyeList } from "@/utils/eyes";
 import { useEyeControlledImages } from "./hooks/useEyeAssets";
 import { ImageEye } from "@/classes/Eye/ImageEye";
 import { Point } from "@/classes/Point";
@@ -15,24 +15,13 @@ export default function Home() {
   const eyeList = useMemo<ImageEye[]>(() => {
     if (!ready) return [];
 
-    // return createRandomEyes({
-    //   count: 20,
-    //   assets: finalAssets,
-    //   width,
-    //   height,
-    //   mode: 'normal'
-    // });
-
-    assets[0].cornea.width = 200;
-    assets[0].pupil.width = 40;
-
-    return [new ImageEye({
-      cornea: assets[0].cornea,
-      pupil: assets[0].pupil,
-      center: new Point(width / 2, height / 2),
-      pupilRadius: 30,
-    })
-    ]
+    return generateEyeList({
+      count: 30,
+      assets,
+      canvasWidth: width,
+      canvasHeight: height,
+      mode: 'random'
+    });
   }, [width, height, ready, assets]);
 
   return (

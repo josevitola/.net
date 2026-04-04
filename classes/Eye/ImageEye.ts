@@ -1,13 +1,14 @@
 import { ControlledImage } from '../ControlledImage';
 import { Eye, EyeFollowConfig, EssentialEyeProps } from './Eye';
 
-type ImageEyeConfig = EssentialEyeProps & Pick<ImageEye, 'cornea' | 'pupil'>;
+export type ImageEyeAssets = Pick<ImageEye, 'cornea' | 'pupil'>;
+type ImageEyeConfig = EssentialEyeProps & ImageEyeAssets;
 
 export class ImageEye extends Eye {
   cornea: ControlledImage;
   pupil: ControlledImage;
 
-  constructor({ cornea, pupil, ...rest }: ImageEyeConfig) {
+  constructor({ cornea, pupil, ...rest }: ImageEyeAssets & Partial<EssentialEyeProps>) {
     const width = cornea.width ?? cornea.img.width;
     const height = (width / cornea.img.width) * cornea.img.height;
 

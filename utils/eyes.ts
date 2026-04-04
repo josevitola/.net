@@ -1,5 +1,5 @@
-import { DrawnEye, ImageEye, Point } from '@/classes';
-import { EyeAsset } from '@/types/assets';
+import { DrawnEye, ImageEye, ImageEyeAssets, Point } from '@/classes';
+import { mapToRange, randomInRange } from './math';
 
 interface InitializeEyesParams {
   width: number;
@@ -46,38 +46,38 @@ export function initializeDrawnEyes({ width, height }: { width: number; height: 
 }
 
 export function initializeImageEyes({
-  corneaImage,
-  pupilImage,
+  cornea,
+  pupil,
   width,
   height,
-}: {
-  corneaImage: HTMLImageElement | null;
-  pupilImage: HTMLImageElement | null;
+}: ImageEyeAssets & {
   width: number;
   height: number;
 }) {
-  if (!corneaImage || !pupilImage) return [];
+  if (!cornea.img.complete || !pupil.img.complete) return [];
   return [
     new ImageEye({
-      cornea: corneaImage,
-      pupil: pupilImage,
+      cornea: cornea,
+      pupil: pupil,
       center: new Point(width / 2, height / 2),
       pupilRadius: 30,
     }),
   ];
 }
 
+export type CreateRandomEyesParams = {
+  assets: ImageEyeAssets[];
+  count: number;
+  canvasWidth: number;
+  canvasHeight: number;
+};
+
 export function chaoticallyCreateRandomEyes({
   assets,
   count,
-  width,
-  height,
-}: {
-  assets: EyeAsset[];
-  count: number;
-  width: number;
-  height: number;
-}): ImageEye[] {
+  canvasWidth,
+  canvasHeight,
+}: CreateRandomEyesParams): ImageEye[] {
   const eyes: ImageEye[] = [];
   for (let i = 0; i < count; i++) {
     const asset = assets[Math.floor(Math.random() * assets.length)];
@@ -85,7 +85,7 @@ export function chaoticallyCreateRandomEyes({
       new ImageEye({
         cornea: asset.cornea,
         pupil: asset.pupil,
-        center: new Point(Math.random() * width, Math.random() * height),
+        center: new Point(Math.random() * canvasWidth, Math.random() * canvasHeight),
         pupilRadius: 30,
       }),
     );
@@ -93,44 +93,77 @@ export function chaoticallyCreateRandomEyes({
   return eyes;
 }
 
-export function createRandomEyes({
+function createEyesInGrid({ assets, count, canvasWidth, canvasHeight }: CreateRandomEyesParams) {
+  const eyes: ImageEye[] = [];
+  const cols = Math.ceil(Math.sqrt(count));
+  const rows = Math.ceil(count / cols);
+  const horizontalSpacing = canvasWidth / (cols + 1);
+  const verticalSpacing = canvasHeight / (rows + 1);
+  let eyeIndex = 0;
+  for (let i = 1; i <= rows; i++) {
+    for (let j = 1; j <= cols; j++) {
+      if (eyeIndex >= count) break;
+      const asset = assets[Math.floor(Math.random() * assets.length)];
+      asset.cornea.width = 100;
+      asset.pupil.width = 50;
+      eyes.push(
+        new ImageEye({
+          cornea: asset.cornea,
+          pupil: asset.pupil,
+          center: new Point(j * horizontalSpacing, i * verticalSpacing),
+          pupilRadius: 30,
+        }),
+      );
+      eyeIndex++;
+    }
+  }
+  return eyes;
+}
+
+function randomlyCreateRandomEyes({
   assets,
   count,
-  width,
-  height,
+  canvasWidth,
+  canvasHeight,
+}: CreateRandomEyesParams) {
+  const eyes: ImageEye[] = [];
+  for (let i = 0; i < count; i++) {
+    const asset = assets[Math.floor(Math.random() * assets.length)];
+    const x = Math.random() * canvasWidth;
+    const y = Math.random() * canvasHeight;
+    const inclination = Math.random() * Math.PI;
+    asset.cornea.width = randomInRange(50, 150);
+    asset.pupil.width = randomInRange(asset.cornea.height * 0.7, asset.cornea.height * 1.3);
+    eyes.push(
+      new ImageEye({
+        cornea: asset.cornea,
+        pupil: asset.pupil,
+        center: new Point(x, y),
+        pupilRadius: 30,
+        inclination,
+      }),
+    );
+  }
+  return eyes;
+}
+
+export function generateEyeList({
+  assets,
+  count,
+  canvasWidth,
+  canvasHeight,
   mode,
-}: {
-  assets: EyeAsset[];
-  count: number;
-  width: number;
-  height: number;
-  mode: 'chaotic' | 'normal';
+}: CreateRandomEyesParams & {
+  mode: 'chaotic' | 'grid' | 'random';
 }): ImageEye[] {
   switch (mode) {
     case 'chaotic':
-      return chaoticallyCreateRandomEyes({ assets, count, width, height });
-    case 'normal':
-      const eyes: ImageEye[] = [];
-      const cols = Math.ceil(Math.sqrt(count));
-      const rows = Math.ceil(count / cols);
-      const horizontalSpacing = width / (cols + 1);
-      const verticalSpacing = height / (rows + 1);
-      let eyeIndex = 0;
-      for (let i = 1; i <= rows; i++) {
-        for (let j = 1; j <= cols; j++) {
-          if (eyeIndex >= count) break;
-          const asset = assets[Math.floor(Math.random() * assets.length)];
-          eyes.push(
-            new ImageEye({
-              cornea: asset.cornea,
-              pupil: asset.pupil,
-              center: new Point(j * horizontalSpacing, i * verticalSpacing),
-              pupilRadius: 30,
-            }),
-          );
-          eyeIndex++;
-        }
-      }
-      return eyes;
+      return chaoticallyCreateRandomEyes({ assets, count, canvasWidth, canvasHeight });
+    case 'grid':
+      return createEyesInGrid({ assets, count, canvasWidth, canvasHeight });
+    case 'random':
+      return randomlyCreateRandomEyes({ assets, count, canvasWidth, canvasHeight });
+    default:
+      return chaoticallyCreateRandomEyes({ assets, count, canvasWidth, canvasHeight });
   }
 }

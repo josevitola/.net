@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { IM_Fell_DW_Pica } from "next/font/google";
 import useGlobalContext from "@/hooks/client/useGlobalContext/useGlobalContext";
+import { Anchor } from "../Anchor/Anchor";
 
 const imFellDWPica = IM_Fell_DW_Pica({
   subsets: ["latin"],
@@ -40,9 +41,9 @@ export function Navbar() {
         <a href="/projects" className="hover:text-gray-400">
           Proyectos
         </a>
-        <a href="/contact" className="hover:text-gray-400">
+        <Anchor href="/contact">
           Contacto
-        </a>
+        </Anchor>
       </div>
     </nav>
   );

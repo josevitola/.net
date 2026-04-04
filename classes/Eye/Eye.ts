@@ -1,8 +1,8 @@
 import { picoid } from '@/utils/random';
 import { Point } from '../Point';
-import { mapRange } from '@/utils/math';
+import { mapToRange } from '@/utils/math';
 
-export type EssentialEyeProps = Pick<Eye, 'center' | 'pupilRadius'>;
+export type EssentialEyeProps = Pick<Eye, 'center' | 'pupilRadius' | 'inclination'>;
 
 export type EyeProps = EssentialEyeProps & Pick<Eye, 'width' | 'height'>;
 
@@ -60,14 +60,15 @@ export abstract class Eye {
     pupilRadius: 0,
     width: 0,
     height: 0,
+    inclination: 0,
   };
 
   static readonly DEFAULT_EYELID_CONFIG: EyelidConfig = {
     dir: LidDirections.UP,
   };
 
-  constructor(config: EyeProps) {
-    const { center, pupilRadius, width, height } = {
+  constructor(config: Partial<EyeProps>) {
+    const { center, pupilRadius, width, height, inclination } = {
       ...Eye.DEFAULT_ABSTRACT_CONFIG,
       ...config,
     };
@@ -76,6 +77,7 @@ export abstract class Eye {
     this.pupilRadius = pupilRadius;
     this.width = width;
     this.height = height;
+    this.inclination = inclination;
 
     this.blinking = BlinkingModes.IDLE;
   }
@@ -273,13 +275,13 @@ export abstract class Eye {
   protected calculatePupilPosition(followConfig: EyeFollowConfig) {
     const { x, y } = followConfig.follow ?? new Point();
 
-    const mappedX = mapRange(
+    const mappedX = mapToRange(
       x - this.center.x,
       [0, followConfig.windowWidth / 2],
       [0, this.width / 2 - this.pupilRadius],
     );
 
-    const mappedY = mapRange(
+    const mappedY = mapToRange(
       y - this.center.y,
       [0, followConfig.windowHeight / 2],
       [0, this.pupilRadius],

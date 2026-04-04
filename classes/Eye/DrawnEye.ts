@@ -19,7 +19,6 @@ export class DrawnEye extends Eye {
     ...Eye.DEFAULT_ABSTRACT_CONFIG,
     lineWidth: 5,
     color: 'orange',
-    id: 'default',
   };
 
   /** Eyelids need an additional angle in order to actually intersect.
@@ -27,17 +26,20 @@ export class DrawnEye extends Eye {
   static readonly MAGIC_EYELID_RADIUS_FACTOR = 0.93;
   static readonly MAGIC_CORNER_FACTOR = 1.05;
 
-  constructor(config: DrawnEyeProps) {
+  constructor(props: Partial<DrawnEyeProps>) {
     const eyeCornerDist =
       DrawnEye.DEFAULT_CONTOUR_RADIUS *
       Math.sin(Eye.DEFAULT_INCLINATION / 2) *
       DrawnEye.MAGIC_CORNER_FACTOR;
 
-    super({
-      ...config,
+    const config = {
+      ...DrawnEye.DEFAULT_CONFIG,
+      ...props,
       width: eyeCornerDist * 2,
-      height: config.pupilRadius * 2,
-    });
+      height: (props.pupilRadius ?? DrawnEye.DEFAULT_CONFIG.pupilRadius) * 2,
+    };
+
+    super(config);
 
     const { color, lineWidth } = {
       ...DrawnEye.DEFAULT_CONFIG,
