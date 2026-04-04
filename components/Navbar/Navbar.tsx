@@ -1,14 +1,17 @@
+'use client';
+
 import Image from "next/image";
 import { IM_Fell_DW_Pica } from "next/font/google";
+import useGlobalContext from "@/hooks/client/useGlobalContext/useGlobalContext";
 
 const imFellDWPica = IM_Fell_DW_Pica({
   subsets: ["latin"],
   weight: "400",
 });
 
-const isDev = process.env.NODE_ENV === "development";
-
 export function Navbar() {
+  const { isEditing, handleSetEditing, isDev } = useGlobalContext();
+
   return (
     <nav className={`${imFellDWPica.className} w-full h-20 text-white flex items-center justify-between py-4 px-10`}>
       <a href="/">
@@ -23,8 +26,10 @@ export function Navbar() {
       </a>
       <div className="space-x-6">
         <button className={`${isDev ? "inline-block" : "hidden"
-          } font-serif h-6 justify-center gap-2 rounded-full bg-foreground px-3 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]`}>
-          Editar
+          } font-serif h-6 justify-center gap-2 rounded-full bg-foreground px-3 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]`}
+          onClick={handleSetEditing}
+        >
+          {isEditing ? "Previsualizar" : "Editar"}
         </button>
         <a href="/" className="hover:text-gray-400">
           Inicio

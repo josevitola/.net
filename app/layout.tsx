@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, IM_Fell_DW_Pica } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "../components";
+import { GlobalContextProvider } from "@/context/GlobalContext";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -30,8 +31,10 @@ export default function RootLayout({
       className={`${dmSans.variable} ${imFellDWPica.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        {children}
+        <GlobalContextProvider>
+          <Navbar />
+          {children}
+        </GlobalContextProvider>
       </body>
     </html>
   );

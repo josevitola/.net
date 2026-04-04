@@ -6,6 +6,7 @@ import { DEFAULT_BLINK_PROB, Colors } from './EyesCanvas.constants';
 import { Eye } from '../../classes/Eye';
 import { Point } from '@/classes';
 import { useMousePos } from '@/hooks/client';
+import useGlobalContext from '@/hooks/client/useGlobalContext/useGlobalContext';
 
 interface EyesCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> {
   eyesById: Map<string, Eye>;
@@ -13,8 +14,7 @@ interface EyesCanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElement> 
   height: number;
 }
 
-const { isEditing, selectEye, selectedEye } = {
-  isEditing: process.env.NODE_ENV === 'development',
+const { selectEye, selectedEye } = {
   selectedEye: null as Eye | null,
   selectEye: (eye: Eye | null) => { },
 }
@@ -23,6 +23,7 @@ const EyesCanvas = ({ eyesById, height, width, ...rest }: EyesCanvasProps) => {
   const [mouseDown, setMouseDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const mousePos = useMousePos();
+  const { isEditing } = useGlobalContext();
 
   const drawBackground = useCallback(
     (ctx: CanvasRenderingContext2D) => {
