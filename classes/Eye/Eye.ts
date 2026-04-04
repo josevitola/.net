@@ -1,4 +1,5 @@
-import { Point } from '../../../classes/Point';
+import { Point } from '../Point';
+import { mapRange } from '@/utils/math';
 
 export type EssentialEyeProps = Pick<Eye, 'center' | 'id' | 'pupilRadius'>;
 
@@ -269,5 +270,19 @@ export abstract class Eye {
 
   protected get lowerRight() {
     return this.center.addX(this.width / 2).addY(this.height / 2);
+  }
+
+  protected calculatePupilPosition(followConfig: EyeFollowConfig) {
+    const { x, y } = followConfig.point ?? new Point();
+    return {
+      x:
+        -1 *
+        mapRange(
+          x - this.center.x,
+          [0, followConfig.windowWidth],
+          [0, this.width / 2 - this.pupilRadius],
+        ),
+      y: mapRange(y - this.center.y, [0, followConfig.windowHeight], [0, this.pupilRadius]),
+    };
   }
 }

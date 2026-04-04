@@ -1,5 +1,4 @@
-import { Point } from '@/classes';
-import { Eye, DrawnEye, ImageEye } from '@/components/EyesCanvas/classes';
+import { DrawnEye, ImageEye, Point } from '@/classes';
 
 interface InitializeEyesParams {
   width: number;
@@ -17,14 +16,12 @@ export function initializeDrawnEyes({
   radius,
   rows,
   width,
-}: InitializeEyesParams): Eye[] {
-  const eyes: Eye[] = [];
-
+}: InitializeEyesParams): DrawnEye[] {
+  const eyes: DrawnEye[] = [];
   for (let i = 1; i < rows + 1; i++) {
     for (let j = 1; j < cols + 1; j++) {
       const x = ((2 * i - 1) * width) / (2 * rows),
         y = ((2 * j - 1) * height) / (2 * cols);
-
       eyes.push(
         new DrawnEye({
           center: new Point(x, y),
@@ -35,10 +32,8 @@ export function initializeDrawnEyes({
       );
     }
   }
-
   return eyes;
 }
-
 export function getDefaultEyes({ width, height }: { width: number; height: number }) {
   return initializeDrawnEyes({
     width,

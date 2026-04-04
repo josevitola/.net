@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 import { Canvas } from '@/components';
 import { DEFAULT_BLINK_PROB, Colors } from './EyesCanvas.constants';
-import { Eye } from './classes';
+import { Eye } from '../../classes/Eye';
 import { Point } from '@/classes';
 import { useMousePos } from '@/hooks/client';
 

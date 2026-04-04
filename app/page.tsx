@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo } from "react";
-import { LinkButton } from "../components";
-import { EyesCanvas } from "../components/EyesCanvas";
+import { EyesCanvas, LinkButton } from "../components";
 import { useImage, useViewport } from "../hooks/client";
-import { initializeImageEyes, ImageEye } from "@/components/EyesCanvas";
+import { ImageEye } from "@/classes";
+import { initializeImageEyes } from "@/utils/eyes";
 
 export default function Home() {
   const { width, height } = useViewport();

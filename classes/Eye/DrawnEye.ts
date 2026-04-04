@@ -1,5 +1,5 @@
-import { arc, mapRange } from '../utils';
-import { Point } from '../../../classes/Point';
+import { Point } from '../Point';
+import { arc } from '@/utils/draw';
 import { BlinkingModes, Eye, EyeFollowConfig, EssentialEyeProps } from './Eye';
 
 type DrawnEyeProps = EssentialEyeProps & {
@@ -73,24 +73,20 @@ export class DrawnEye extends Eye {
   }
 
   protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig) {
-    const { pupilRadius: r, startPoint } = this;
-    const { x, y } = followConfig.point ?? new Point();
+    const { pupilRadius: r } = this;
+    const { x: pupilX, y: pupilY } = this.calculatePupilPosition(followConfig);
 
     ctx.save();
     ctx.resetTransform();
     ctx.translate(this.center.x, this.center.y);
 
-    const mapX = -1 * mapRange(x - this.center.x, [0, followConfig.windowWidth], [0, startPoint.x]);
-
-    const mapY = mapRange(y - this.center.y, [0, followConfig.windowHeight], [0, this.pupilRadius]);
-
     // draw concentric circles
     [...new Array(Eye.NUM_PUPILS).keys()].forEach((i) => {
       const logFactor = Math.log(i + 2) / Math.log(Eye.NUM_PUPILS + 1);
-      arc(ctx, mapX, mapY, r * logFactor, 0, Math.PI * 2);
+      arc(ctx, pupilX, pupilY, r * logFactor, 0, Math.PI * 2);
     });
 
-    arc(ctx, mapX, mapY, r * 0.1, 0, 2 * Math.PI);
+    arc(ctx, pupilX, pupilY, r * 0.1, 0, 2 * Math.PI);
     ctx.restore();
   }
 
