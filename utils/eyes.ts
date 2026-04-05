@@ -1,5 +1,5 @@
 import { DrawnEye, ImageEye, ImageEyeAssets, Point } from '@/classes';
-import { mapToRange, randomInRange } from './math';
+import { randomInRange } from './math';
 
 interface InitializeEyesParams {
   width: number;
@@ -128,10 +128,10 @@ function randomlyCreateRandomEyes({
 }: CreateRandomEyesParams) {
   const eyes: ImageEye[] = [];
   for (let i = 0; i < count; i++) {
-    const asset = assets[Math.floor(Math.random() * assets.length)];
+    const asset = { ...assets[Math.floor(Math.random() * assets.length)] };
     const x = Math.random() * canvasWidth;
     const y = Math.random() * canvasHeight;
-    const inclination = Math.random() * Math.PI;
+    const inclination = randomInRange(-Math.PI / 2, Math.PI / 2);
     asset.cornea.width = randomInRange(50, 150);
     asset.pupil.width = randomInRange(asset.cornea.height * 0.7, asset.cornea.height * 1.3);
     eyes.push(

@@ -118,7 +118,7 @@ export abstract class Eye {
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.fillText(
-      this.id,
+      `${this.id} (${(this.inclination / Math.PI).toFixed(2)}π)`,
       this.lowerCenter.x,
       this.lowerCenter.y + Eye.INFO_FONT_SIZE + Eye.EXTERNAL_MARGIN * 1.5,
     );
