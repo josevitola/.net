@@ -150,7 +150,7 @@ export abstract class Eye {
   }
 
   isHovered(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    return ctx.isPointInPath(this.getExternalBoxPath(), mousePos.x, mousePos.y);
+    return ctx.isPointInPath(this.getExternalBoxPath(this.upperLeft), mousePos.x, mousePos.y);
   }
 
   drawBoxes(ctx: CanvasRenderingContext2D, mousePos: Point) {
@@ -177,6 +177,19 @@ export abstract class Eye {
     ctx.restore();
   }
 
+  private drawExternalBox(ctx: CanvasRenderingContext2D) {
+    ctx.save();
+    ctx.setLineDash([7, 7]);
+    ctx.strokeStyle = 'white';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.translate(this.center.x, this.center.y);
+    ctx.rotate(this.inclination);
+    const startPoint = new Point(-this.width / 2, -this.height / 2);
+    ctx.fill(this.getExternalBoxPath(startPoint));
+    ctx.stroke(this.getExternalBoxPath(startPoint));
+    ctx.restore();
+  }
+
   onDragStart(ctx: CanvasRenderingContext2D, mousePos: Point) {
     if (this.upperCenter.isHovered(mousePos)) {
       this.dragMode = DragModes.UPPER_CENTER;
@@ -193,35 +206,28 @@ export abstract class Eye {
     this.dragMode = undefined;
   }
 
-  private drawExternalBox(ctx: CanvasRenderingContext2D) {
-    ctx.save();
-    ctx.setLineDash([7, 7]);
-    ctx.strokeStyle = 'white';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.fill(this.getExternalBoxPath());
-    ctx.stroke(this.getExternalBoxPath());
-    ctx.restore();
-  }
-
   get originRect(): Rect {
     return new Rect(0, 0, this.width, this.height);
   }
 
+  get rect(): Rect {
+    return this.originRect.translateTo(this.upperLeft);
+  }
+
   getBoxPath(startPoint: Point = new Point()): Path2D {
     const boxPath = new Path2D();
-    const { x, y, width, height } = this.originRect;
-    boxPath.rect(x + startPoint.x, y + startPoint.y, width, height);
+    const { x, y, width, height } = this.originRect.translateTo(startPoint);
+    boxPath.rect(x, y, width, height);
     return boxPath;
   }
 
-  getExternalBoxPath() {
+  getExternalBoxPath(startPoint: Point = new Point()) {
     const boxPath = new Path2D();
-    boxPath.rect(
-      this.upperLeft.x - Eye.EXTERNAL_MARGIN,
-      this.upperLeft.y - Eye.EXTERNAL_MARGIN,
-      this.width + 2 * Eye.EXTERNAL_MARGIN,
-      this.height + 2 * Eye.EXTERNAL_MARGIN,
-    );
+    const { x, y, width, height } = this.originRect
+      .translateTo(startPoint.add(new Point(-Eye.EXTERNAL_MARGIN, -Eye.EXTERNAL_MARGIN)))
+      .addWidth(2 * Eye.EXTERNAL_MARGIN)
+      .addHeight(2 * Eye.EXTERNAL_MARGIN);
+    boxPath.rect(x, y, width, height);
     return boxPath;
   }
 

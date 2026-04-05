@@ -1,3 +1,5 @@
+import { Point } from './Point';
+
 export class Rect {
   x: number;
   y: number;
@@ -17,5 +19,9 @@ export class Rect {
 
   addHeight(delta: number) {
     return new Rect(this.x, this.y, this.width, this.height + delta);
+  }
+
+  translateTo(delta: Point) {
+    return new Rect(this.x + delta.x, this.y + delta.y, this.width, this.height);
   }
 }
