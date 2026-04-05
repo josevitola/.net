@@ -156,12 +156,28 @@ export abstract class Eye {
   drawBoxes(ctx: CanvasRenderingContext2D, mousePos: Point) {
     this.drawExternalBox(ctx);
     this.drawInternalBox(ctx);
-    this.vectors.forEach((corner) => {
+    this.drawCorners(ctx, mousePos);
+    this.drawMidpoints(ctx, mousePos);
+  }
+
+  drawCorners(ctx: CanvasRenderingContext2D, mousePos: Point) {
+    ctx.save();
+    ctx.translate(this.center.x, this.center.y);
+    ctx.rotate(this.inclination);
+    this.originCorners.forEach((corner) => {
       corner.draw(ctx, mousePos, { coordinates: false });
     });
-    this.corners.forEach((corner) => {
-      corner.draw(ctx, mousePos, { coordinates: false });
+    ctx.restore();
+  }
+
+  drawMidpoints(ctx: CanvasRenderingContext2D, mousePos: Point) {
+    ctx.save();
+    ctx.translate(this.center.x, this.center.y);
+    ctx.rotate(this.inclination);
+    this.originMidpoints.forEach((midpoint) => {
+      midpoint.draw(ctx, mousePos, { coordinates: false });
     });
+    ctx.restore();
   }
 
   drawInternalBox(ctx: CanvasRenderingContext2D) {
@@ -206,12 +222,20 @@ export abstract class Eye {
     this.dragMode = undefined;
   }
 
+  get rect(): Rect {
+    return this.originRect.translateTo(this.upperLeft);
+  }
+
   get originRect(): Rect {
     return new Rect(0, 0, this.width, this.height);
   }
 
-  get rect(): Rect {
-    return this.originRect.translateTo(this.upperLeft);
+  get originMidpoints() {
+    return [
+      new Point(0, -this.height / 2),
+      new Point(-this.width / 2, 0),
+      new Point(this.width / 2, 0),
+    ];
   }
 
   getBoxPath(startPoint: Point = new Point()): Path2D {
@@ -257,8 +281,13 @@ export abstract class Eye {
     return [this.upperLeft, this.upperRight, this.lowerLeft, this.lowerRight];
   }
 
-  protected get vectors() {
-    return [this.upperCenter, this.leftCenter, this.rightCenter];
+  protected get originCorners() {
+    return [
+      new Point(-this.width / 2, -this.height / 2),
+      new Point(this.width / 2, -this.height / 2),
+      new Point(-this.width / 2, this.height / 2),
+      new Point(this.width / 2, this.height / 2),
+    ];
   }
 
   protected get leftCenter() {
