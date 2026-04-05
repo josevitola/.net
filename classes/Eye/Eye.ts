@@ -1,6 +1,7 @@
 import { picoid } from '@/utils/random';
 import { Point } from '../Point';
 import { mapToRange } from '@/utils/math';
+import { Rect } from '../Rect';
 
 export type EssentialEyeProps = Pick<Eye, 'center' | 'pupilRadius' | 'inclination'>;
 
@@ -166,11 +167,13 @@ export abstract class Eye {
   drawInternalBox(ctx: CanvasRenderingContext2D) {
     ctx.save();
     ctx.setLineDash([7, 7]);
-    ctx.rotate(this.inclination);
     ctx.strokeStyle = 'white';
     ctx.fillStyle = 'rgba(0, 0, 255, 0.1)';
-    ctx.fill(this.getBoxPath());
-    ctx.stroke(this.getBoxPath());
+    ctx.translate(this.center.x, this.center.y);
+    ctx.rotate(this.inclination);
+    const startPoint = new Point(-this.width / 2, -this.height / 2);
+    ctx.fill(this.getBoxPath(startPoint));
+    ctx.stroke(this.getBoxPath(startPoint));
     ctx.restore();
   }
 
@@ -193,7 +196,6 @@ export abstract class Eye {
   private drawExternalBox(ctx: CanvasRenderingContext2D) {
     ctx.save();
     ctx.setLineDash([7, 7]);
-    ctx.rotate(this.inclination);
     ctx.strokeStyle = 'white';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.fill(this.getExternalBoxPath());
@@ -201,9 +203,14 @@ export abstract class Eye {
     ctx.restore();
   }
 
-  getBoxPath() {
+  get originRect(): Rect {
+    return new Rect(0, 0, this.width, this.height);
+  }
+
+  getBoxPath(startPoint: Point = new Point()): Path2D {
     const boxPath = new Path2D();
-    boxPath.rect(this.upperLeft.x, this.upperLeft.y, this.width, this.height);
+    const { x, y, width, height } = this.originRect;
+    boxPath.rect(x + startPoint.x, y + startPoint.y, width, height);
     return boxPath;
   }
 
