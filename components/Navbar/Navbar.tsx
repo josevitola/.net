@@ -24,7 +24,7 @@ export function Navbar() {
           priority
         />
       </a>
-      <div className="space-x-6">
+      <div className="flex flex-col md:flex-row space-x-6">
         <button className={`${isDev ? "inline-block" : "hidden"
           } font-serif h-6 justify-center gap-2 rounded-full bg-primary px-3 text-background transition-colors hover:bg-primary-active hover:text-primary-light hover:cursor-pointer`}
           onClick={handleSetEditing}

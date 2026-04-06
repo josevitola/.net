@@ -18,4 +18,8 @@ export class ControlledImage {
   set width(value: number | null) {
     this._width = value;
   }
+
+  copy(): ControlledImage {
+    return new ControlledImage(this.img, this._width);
+  }
 }
