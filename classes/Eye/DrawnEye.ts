@@ -25,6 +25,8 @@ export class DrawnEye extends Eye {
    * Not sure why. */
   static readonly MAGIC_EYELID_RADIUS_FACTOR = 0.93;
   static readonly MAGIC_CORNER_FACTOR = 1.05;
+  static readonly DEFAULT_CONTOUR_RADIUS = 90;
+  static readonly NUM_PUPILS = 3;
 
   constructor(props: Partial<DrawnEyeProps>) {
     const eyeCornerDist =
@@ -83,8 +85,8 @@ export class DrawnEye extends Eye {
     ctx.translate(this.center.x, this.center.y);
 
     // draw concentric circles
-    [...new Array(Eye.NUM_PUPILS).keys()].forEach((i) => {
-      const logFactor = Math.log(i + 2) / Math.log(Eye.NUM_PUPILS + 1);
+    [...new Array(DrawnEye.NUM_PUPILS).keys()].forEach((i) => {
+      const logFactor = Math.log(i + 2) / Math.log(DrawnEye.NUM_PUPILS + 1);
       arc(ctx, pupilX, pupilY, r * logFactor, 0, Math.PI * 2);
     });
 
