@@ -1,6 +1,6 @@
 import { Point } from '../Point';
 import { arc } from '@/utils/draw';
-import { BlinkingModes, Eye, EyeFollowConfig, EssentialEyeProps } from './Eye';
+import { BlinkingModes, Eye, MouseInfo, EssentialEyeProps } from './Eye';
 
 type DrawnEyeProps = EssentialEyeProps & {
   lineWidth?: number;
@@ -76,7 +76,7 @@ export class DrawnEye extends Eye {
     }
   }
 
-  protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig) {
+  protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: MouseInfo) {
     const { pupilRadius: r } = this;
     const { x: pupilX, y: pupilY } = this.calcPupilPositionToEyeCenter(followConfig);
 

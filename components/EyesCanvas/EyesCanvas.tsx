@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Canvas } from '@/components';
 import { DEFAULT_BLINK_PROB, Colors } from './EyesCanvas.constants';
 import { Eye } from '../../classes/Eye';
@@ -33,6 +33,13 @@ const EyesCanvas = ({ eyeList, height, width, ...rest }: EyesCanvasProps) => {
     [width, height],
   );
 
+  const mouseInfo = useMemo(() => ({
+    position: mousePos,
+    windowHeight: height,
+    windowWidth: width,
+
+  }), [mousePos, height, width]);
+
   const shouldApplyMouseEventsToEye = useCallback(
     (ctx: CanvasRenderingContext2D, eye: Eye): boolean => {
       if (!isEditing) {
@@ -40,11 +47,6 @@ const EyesCanvas = ({ eyeList, height, width, ...rest }: EyesCanvasProps) => {
       }
 
       let isHovered = eye.isHovered(ctx, mousePos);
-
-      if (isHovered) {
-        eye.updateCursor(ctx, mousePos);
-        eye.drawBoxes(ctx, mousePos);
-      }
 
       if (mouseDown) {
         if (isHovered && !isDragging) {
@@ -78,15 +80,7 @@ const EyesCanvas = ({ eyeList, height, width, ...rest }: EyesCanvasProps) => {
           eye.updateBlink();
         }
 
-        eye.update(ctx, {
-          follow: mousePos,
-          windowHeight: height,
-          windowWidth: width,
-        });
-
-        if (isEditing) {
-          eye.drawInfo(ctx);
-        }
+        eye.update(ctx, { mouseInfo, debug: isEditing });
 
         if (eye.id === selectedEye?.id) {
           eye.drawInternalBox(ctx);

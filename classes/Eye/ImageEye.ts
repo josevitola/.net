@@ -1,5 +1,5 @@
 import { ControlledImage } from '../ControlledImage';
-import { Eye, EyeFollowConfig, EssentialEyeProps } from './Eye';
+import { Eye, MouseInfo, EssentialEyeProps } from './Eye';
 
 export type ImageEyeAssets = Pick<ImageEye, 'cornea' | 'pupil'>;
 
@@ -33,7 +33,7 @@ export class ImageEye extends Eye {
     }
   }
 
-  protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig) {
+  protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: MouseInfo) {
     const { x: pupilX, y: pupilY } = this.calcPupilPositionToEyeCenter(followConfig);
     const { width: pupilWidth, height: pupilHeight } = this.pupil;
 

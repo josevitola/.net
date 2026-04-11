@@ -6,11 +6,16 @@ export type EssentialEyeProps = Pick<Eye, 'center' | 'pupilRadius' | 'inclinatio
 
 export type EyeProps = EssentialEyeProps & Pick<Eye, 'width' | 'height'>;
 
-export type EyeFollowConfig = {
-  follow: Point | undefined;
+export type MouseInfo = {
+  position: Point;
   windowWidth: number;
   windowHeight: number;
 };
+
+type UpdateProps = {
+  mouseInfo: MouseInfo;
+  debug?: boolean;
+}
 
 export enum BlinkingModes {
   IDLE = 'IDLE',
@@ -52,26 +57,35 @@ export abstract class Eye extends Box {
     this.blinking = BlinkingModes.IDLE;
   }
 
-  update(ctx: CanvasRenderingContext2D, followConfig?: EyeFollowConfig) {
-    this.draw(ctx, followConfig);
+  update(ctx: CanvasRenderingContext2D, { mouseInfo, debug }: UpdateProps) {
+    this.draw(ctx, mouseInfo);
+    if (debug) {
+      this.drawDebug(ctx, mouseInfo.position);
+    }
     this.updateActions();
   }
 
-  private draw(ctx: CanvasRenderingContext2D, followConfig?: EyeFollowConfig) {
+  drawDebug(ctx: CanvasRenderingContext2D, mousePos: Point) {
+    let isHovered = this.isHovered(ctx, mousePos);
+
+    if (isHovered) {
+      this.updateCursor(ctx, mousePos);
+      this.drawBoxes(ctx, mousePos);
+    }
+
+    this.drawInfo(ctx);
+  }
+
+  private draw(ctx: CanvasRenderingContext2D, mouseInfo: MouseInfo) {
     ctx.save();
     this.setupContext(ctx);
     this.drawContour(ctx);
-    this.drawPupil(ctx, {
-      follow: new Point(0, 0),
-      windowHeight: 2,
-      windowWidth: 2,
-      ...followConfig,
-    });
+    this.drawPupil(ctx, mouseInfo);
     ctx.restore();
   }
 
   abstract updateBlink(): void;
-  protected abstract drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig): void;
+  protected abstract drawPupil(ctx: CanvasRenderingContext2D, followConfig: MouseInfo): void;
   protected abstract drawContour(ctx: CanvasRenderingContext2D): void;
 
   private updateActions() {
@@ -96,8 +110,8 @@ export abstract class Eye extends Box {
     if (this.blinking === IDLE) this.blinking = OPENING;
   }
 
-  protected calcPupilPositionToEyeCenter(followConfig: EyeFollowConfig) {
-    const { x, y } = followConfig.follow ?? new Point();
+  protected calcPupilPositionToEyeCenter(followConfig: MouseInfo) {
+    const { x, y } = followConfig.position ?? new Point();
     const cx = this.center.x;
     const cy = this.center.y;
     const dx = x - cx;
