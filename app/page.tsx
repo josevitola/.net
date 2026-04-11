@@ -17,7 +17,6 @@ export default function Home() {
 
   const eyeList = useMemo<ImageEye[]>(() => {
     if (!ready) return [];
-
     return generateEyeList({
       count: EYES_PER_DEVICE[getDeviceSizeCategory()] || 20,
       assets,
@@ -38,7 +37,7 @@ export default function Home() {
   }, [eyeList, setOnNavbarItemHover]);
 
   const onMouseOverButton = useCallback(() => {
-    shakeAllEyes(60);
+    shakeAllEyes(40);
   }, [eyeList]);
 
   return (

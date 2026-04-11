@@ -1,6 +1,7 @@
 import { Point } from '../Point';
 import { scale } from '@/utils/math';
 import { Box } from '../Box';
+import { TimeAction } from '../TimeAction';
 
 export type EssentialEyeProps = Pick<Eye, 'center' | 'pupilRadius' | 'inclination'>;
 
@@ -35,8 +36,7 @@ type EyelidConfig = {
 export abstract class Eye extends Box {
   pupilRadius: number;
   blinking: BlinkingModes;
-  private _framesSinceShake: number = -1;
-  private _shakeDuration: number | null = null;
+  shakeAction: TimeAction;
 
   static readonly DEFAULT_SHAKE_DURATION = 20;
   static readonly BLINK_SPEED = 2;
@@ -53,10 +53,10 @@ export abstract class Eye extends Box {
       ...Eye.DEFAULT_ABSTRACT_CONFIG,
       ...config,
     };
-
     super({ center, width, height, inclination });
     this.pupilRadius = pupilRadius;
     this.blinking = BlinkingModes.IDLE;
+    this.shakeAction = new TimeAction(() => this.shake(), Eye.DEFAULT_SHAKE_DURATION);
   }
 
   update(ctx: CanvasRenderingContext2D, { mouseInfo, debug }: UpdateProps) {
@@ -91,17 +91,7 @@ export abstract class Eye extends Box {
   protected abstract drawContour(ctx: CanvasRenderingContext2D): void;
 
   private updateActions() {
-    this.updateShaking();
-  }
-
-  updateShaking() {
-    if (!this._shakeDuration) return;
-
-    if (this._framesSinceShake >= 0 && this._framesSinceShake < this._shakeDuration) {
-      this.shake();
-    } else if (this._framesSinceShake >= this._shakeDuration) {
-      this.endShaking();
-    }
+    this.shakeAction.update();
   }
 
   setupContext(ctx: CanvasRenderingContext2D) {
@@ -135,16 +125,13 @@ export abstract class Eye extends Box {
   shake() {
     const randomAngle = (Math.random() - 0.5) * 0.2;
     this.inclination += randomAngle;
-    this._framesSinceShake++;
   }
 
   startShaking(durationInFrames: number = Eye.DEFAULT_SHAKE_DURATION) {
-    this._framesSinceShake = 0;
-    this._shakeDuration = durationInFrames;
+    this.shakeAction.start(durationInFrames);
   }
 
   endShaking() {
-    this._framesSinceShake = -1;
-    this._shakeDuration = null;
+    this.shakeAction.end();
   }
 }
