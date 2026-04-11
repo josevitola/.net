@@ -1,6 +1,6 @@
 'use client';
 
-import { GlobalContext } from '@/context/GlobalContext';
+import { GlobalContext } from '@/context';
 import { useContext } from 'react';
 
 export default function useGlobalContext() {

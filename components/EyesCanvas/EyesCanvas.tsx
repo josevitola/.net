@@ -21,8 +21,8 @@ const { selectEye, selectedEye } = {
 const EyesCanvas = ({ eyeList, height, width, ...rest }: EyesCanvasProps) => {
   const [mouseDown, setMouseDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const mousePos = useMousePos();
   const { isEditing } = useGlobalContext();
+  const mousePos = useMousePos();
 
   const drawBackground = useCallback(
     (ctx: CanvasRenderingContext2D) => {

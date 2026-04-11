@@ -1,26 +1,25 @@
 'use client';
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useLayoutEffect, useMemo } from "react";
 import { EyesCanvas, LinkButton } from "../components";
 import { useViewport } from "../hooks/client";
 import { generateEyeList } from "@/utils/eyes";
 import { useEyeControlledImages } from "./hooks/useEyeAssets";
 import { ImageEye } from "@/classes";
 import { getDeviceSizeCategory } from "@/utils/ui";
+import useGlobalContext from "@/hooks/client/useGlobalContext/useGlobalContext";
+import { EYES_PER_DEVICE } from "./page.constants";
 
 export default function Home() {
   const { width, height } = useViewport();
   const { assets, ready } = useEyeControlledImages();
+  const { setOnNavbarItemHover } = useGlobalContext();
 
   const eyeList = useMemo<ImageEye[]>(() => {
     if (!ready) return [];
 
     return generateEyeList({
-      count: {
-        mobile: 20,
-        tablet: 25,
-        desktop: 30,
-      }[getDeviceSizeCategory()] || 20,
+      count: EYES_PER_DEVICE[getDeviceSizeCategory()] || 20,
       assets,
       canvasWidth: width,
       canvasHeight: height,
@@ -28,8 +27,18 @@ export default function Home() {
     });
   }, [width, height, ready, assets]);
 
+  const shakeAllEyes = useCallback((frames?: number) => {
+    eyeList.forEach(eye => eye.startShaking(frames));
+  }, [eyeList]);
+
+  useLayoutEffect(() => {
+    setOnNavbarItemHover(() => () => {
+      shakeAllEyes();
+    });
+  }, [eyeList, setOnNavbarItemHover]);
+
   const onMouseOverButton = useCallback(() => {
-    eyeList.forEach(eye => eye.startShaking());
+    shakeAllEyes(60);
   }, [eyeList]);
 
   return (

@@ -23,9 +23,7 @@ export class ImageEye extends Eye {
     this.pupil = pupil;
   }
 
-  updateBlink() {
-    console.log('TODO: implement blink update logic for ImageEye');
-  }
+  updateBlink() { }
 
   protected drawContour(ctx: CanvasRenderingContext2D) {
     if (this.cornea.img.complete) {

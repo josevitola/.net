@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { IM_Fell_DW_Pica } from "next/font/google";
 import useGlobalContext from "@/hooks/client/useGlobalContext/useGlobalContext";
+import { NAVBAR_ITEMS } from "./Navbar.constants";
 
 const imFellDWPica = IM_Fell_DW_Pica({
   subsets: ["latin"],
@@ -10,7 +11,7 @@ const imFellDWPica = IM_Fell_DW_Pica({
 });
 
 export function Navbar() {
-  const { isEditing, handleSetEditing, isDev } = useGlobalContext();
+  const { isEditing, isDev, handleSetEditing, onNavbarItemHover } = useGlobalContext();
 
   return (
     <nav className={`${imFellDWPica.className} w-full h-20 flex items-center justify-between py-4 px-10`}>
@@ -31,18 +32,16 @@ export function Navbar() {
         >
           {isEditing ? "Previsualizar" : "Editar"}
         </button>
-        <a href="/" className="hover:text-gray-400">
-          Inicio
-        </a>
-        <a href="/about" className="hover:text-gray-400">
-          Acerca de
-        </a>
-        <a href="/projects" className="hover:text-gray-400">
-          Proyectos
-        </a>
-        <a href="/contact" className="hover:text-gray-400">
-          Contacto
-        </a>
+        {NAVBAR_ITEMS.map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            className="hover:text-gray-400"
+            onMouseOver={onNavbarItemHover}
+          >
+            {item.label}
+          </a>
+        ))}
       </div>
     </nav>
   );

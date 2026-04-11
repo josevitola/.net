@@ -138,9 +138,9 @@ export abstract class Eye extends Box {
     this._framesSinceShake++;
   }
 
-  startShaking(duration: number = Eye.DEFAULT_SHAKE_DURATION) {
+  startShaking(durationInFrames: number = Eye.DEFAULT_SHAKE_DURATION) {
     this._framesSinceShake = 0;
-    this._shakeDuration = duration;
+    this._shakeDuration = durationInFrames;
   }
 
   endShaking() {
