@@ -9,6 +9,13 @@ type BoxProps = {
   inclination: number;
 };
 
+export enum DragModes {
+  UPPER_CENTER = 'UPPER_CENTER',
+  LEFT_CENTER = 'LEFT_CENTER',
+  RIGHT_CENTER = 'RIGHT_CENTER',
+  BODY = 'BODY',
+}
+
 export class Box {
   id = picoid();
 
@@ -16,11 +23,13 @@ export class Box {
   width: number;
   height: number;
   inclination: number = 0;
+  dragMode?: DragModes;
 
   private _info: string = '';
 
   static readonly INFO_FONT_SIZE = 12;
   static readonly EXTERNAL_MARGIN = 10;
+  static readonly DEFAULT_INCLINATION = Math.PI / 2;
 
   static readonly DEFAULT_PROPS: Required<BoxProps> = {
     center: new Point(0, 0),
@@ -193,5 +202,43 @@ export class Box {
     ctx.fill(this.getExternalBoxPath(startPoint));
     ctx.stroke(this.getExternalBoxPath(startPoint));
     ctx.restore();
+  }
+
+
+  onDragStart(ctx: CanvasRenderingContext2D, mousePos: Point) {
+    if (this.upperCenter.isHovered(mousePos)) {
+      this.dragMode = DragModes.UPPER_CENTER;
+    } else if (this.leftCenter.isHovered(mousePos)) {
+      this.dragMode = DragModes.LEFT_CENTER;
+    } else if (this.rightCenter.isHovered(mousePos)) {
+      this.dragMode = DragModes.RIGHT_CENTER;
+    } else if (this.isHovered(ctx, mousePos)) {
+      this.dragMode = DragModes.BODY;
+    }
+  }
+
+  onDrag(mousePos: Point) {
+    switch (this.dragMode) {
+      case DragModes.UPPER_CENTER:
+        this.height -= mousePos.y - this.upperCenter.y;
+        break;
+      case DragModes.LEFT_CENTER:
+        this.width -= mousePos.x - this.leftCenter.x;
+        break;
+      case DragModes.RIGHT_CENTER:
+        this.width += mousePos.x - this.rightCenter.x;
+        break;
+      case DragModes.BODY:
+        this.center = mousePos;
+        break;
+    }
+  }
+
+  onDragEnd() {
+    this.dragMode = undefined;
+  }
+
+  isHovered(ctx: CanvasRenderingContext2D, mousePos: Point) {
+    return ctx.isPointInPath(this.getExternalBoxPath(this.upperLeft), mousePos.x, mousePos.y);
   }
 }

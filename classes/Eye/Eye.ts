@@ -18,13 +18,6 @@ export enum BlinkingModes {
   CLOSING = 'CLOSING',
 }
 
-export enum DragModes {
-  UPPER_CENTER = 'UPPER_CENTER',
-  LEFT_CENTER = 'LEFT_CENTER',
-  RIGHT_CENTER = 'RIGHT_CENTER',
-  BODY = 'BODY',
-}
-
 enum LidDirections {
   UP = 'UP',
   DOWN = 'DOWN',
@@ -36,12 +29,8 @@ type EyelidConfig = {
 
 export abstract class Eye extends Box {
   pupilRadius: number;
-
   blinking: BlinkingModes;
 
-  dragMode?: DragModes;
-
-  static readonly DEFAULT_INCLINATION = Math.PI / 2;
   static readonly BLINK_SPEED = 2;
 
   static readonly DEFAULT_ABSTRACT_CONFIG: Required<EyeProps> = {
@@ -59,9 +48,8 @@ export abstract class Eye extends Box {
       ...config,
     };
 
-    super({ center, width, height });
+    super({ center, width, height, inclination });
     this.pupilRadius = pupilRadius;
-    this.inclination = inclination;
     this.blinking = BlinkingModes.IDLE;
   }
 
@@ -79,9 +67,7 @@ export abstract class Eye extends Box {
   }
 
   abstract updateBlink(): void;
-
   protected abstract drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig): void;
-
   protected abstract drawContour(ctx: CanvasRenderingContext2D): void;
 
   setupContext(ctx: CanvasRenderingContext2D) {
@@ -92,43 +78,6 @@ export abstract class Eye extends Box {
   startBlinking() {
     const { IDLE, OPENING } = BlinkingModes;
     if (this.blinking === IDLE) this.blinking = OPENING;
-  }
-
-  onDrag(mousePos: Point) {
-    switch (this.dragMode) {
-      case DragModes.UPPER_CENTER:
-        this.height -= mousePos.y - this.upperCenter.y;
-        break;
-      case DragModes.LEFT_CENTER:
-        this.width -= mousePos.x - this.leftCenter.x;
-        break;
-      case DragModes.RIGHT_CENTER:
-        this.width += mousePos.x - this.rightCenter.x;
-        break;
-      case DragModes.BODY:
-        this.center = mousePos;
-        break;
-    }
-  }
-
-  isHovered(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    return ctx.isPointInPath(this.getExternalBoxPath(this.upperLeft), mousePos.x, mousePos.y);
-  }
-
-  onDragStart(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    if (this.upperCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.UPPER_CENTER;
-    } else if (this.leftCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.LEFT_CENTER;
-    } else if (this.rightCenter.isHovered(mousePos)) {
-      this.dragMode = DragModes.RIGHT_CENTER;
-    } else if (this.isHovered(ctx, mousePos)) {
-      this.dragMode = DragModes.BODY;
-    }
-  }
-
-  onDragEnd() {
-    this.dragMode = undefined;
   }
 
   updateCursor(ctx: CanvasRenderingContext2D, mousePos: Point) {
@@ -169,5 +118,10 @@ export abstract class Eye extends Box {
       : cy + scale(dy, [0, -followConfig.windowHeight], [0, -this.height / 2]);
 
     return { x: mappedX, y: mappedY };
+  }
+
+  startShaking() {
+    const randomAngle = (Math.random() - 0.5) * 0.2; // Random angle between -0.1 and 0.1 radians
+    this.inclination += randomAngle;
   }
 }
