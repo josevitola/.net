@@ -30,20 +30,28 @@ export default function Home() {
     eyeList.forEach(eye => eye.startShaking(frames));
   }, [eyeList]);
 
-  const focusAllEyes = useCallback((frames?: number) => {
-    eyeList.forEach(eye => eye.startFocus(frames));
+  const contractAllPupils = useCallback((frames?: number) => {
+    eyeList.forEach(eye => eye.contractPupil(frames));
+  }, [eyeList]);
+
+  const expandAllPupils = useCallback((frames?: number) => {
+    eyeList.forEach(eye => eye.expandPupil(frames));
   }, [eyeList]);
 
   useLayoutEffect(() => {
     setOnNavbarItemHover(() => () => {
       shakeAllEyes();
     });
-  }, [eyeList, setOnNavbarItemHover]);
+  }, [eyeList, setOnNavbarItemHover, shakeAllEyes]);
 
-  const onMouseOverButton = useCallback(() => {
+  const onMouseEnterButton = useCallback(() => {
     shakeAllEyes(40);
-    focusAllEyes(40);
-  }, [shakeAllEyes, focusAllEyes]);
+    contractAllPupils(20);
+  }, [shakeAllEyes, contractAllPupils]);
+
+  const onMouseLeaveButton = useCallback(() => {
+    expandAllPupils(30);
+  }, [expandAllPupils]);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans">
@@ -51,7 +59,14 @@ export default function Home() {
         <div className="absolute left-0 top-2/3 w-full flex flex-col items-center gap-4 text-center sm:items-start sm:text-left">
           <h1 className="font-serif text-6xl mx-auto font-semibold leading-10 tracking-widest text-primary-active md:text-7xl">camaleones</h1>
           <p className="max-w-md text-lg leading-8 mx-auto text-primary"><strong>Nuevo disco. Agosto de 2026.</strong></p>
-          <LinkButton href="/projects/camaleones" className="mx-auto" onMouseOver={onMouseOverButton}>Saber más</LinkButton>
+          <LinkButton
+            href="/projects/camaleones"
+            className="mx-auto"
+            onMouseEnter={onMouseEnterButton}
+            onMouseLeave={onMouseLeaveButton}
+          >
+            Saber más
+          </LinkButton>
         </div>
       </main>
       <EyesCanvas className="absolute -z-10 top-0 left-0" eyeList={eyeList} width={width} height={height} />

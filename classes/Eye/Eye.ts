@@ -57,7 +57,7 @@ export abstract class Eye extends Box {
     super({ center, width, height, inclination });
     this.pupilRadius = pupilRadius;
     this.blinking = BlinkingModes.IDLE;
-    this.shakeAction = new TimeAction(() => this.shake(), Eye.DEFAULT_SHAKE_DURATION);
+    this.shakeAction = new TimeAction(() => this.shake());
     this.actions = [this.shakeAction];
   }
 
