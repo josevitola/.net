@@ -3,8 +3,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Canvas } from '@/components';
 import { DEFAULT_BLINK_PROB, Colors } from './EyesCanvas.constants';
-import { Eye } from '../../classes/Eye';
-import { Point } from '@/classes';
+import { Eye, Point } from '@/classes';
 import { useMousePos } from '@/hooks/client';
 import useGlobalContext from '@/hooks/client/useGlobalContext/useGlobalContext';
 
@@ -37,7 +36,6 @@ const EyesCanvas = ({ eyeList, height, width, ...rest }: EyesCanvasProps) => {
     position: mousePos,
     windowHeight: height,
     windowWidth: width,
-
   }), [mousePos, height, width]);
 
   const shouldApplyMouseEventsToEye = useCallback(
@@ -93,7 +91,7 @@ const EyesCanvas = ({ eyeList, height, width, ...rest }: EyesCanvasProps) => {
         ctx.canvas.style.cursor = '';
       }
     },
-    [eyeList, mousePos, height, width, isEditing],
+    [eyeList, mouseInfo, isEditing],
   );
 
   const draw = useCallback(

@@ -36,7 +36,9 @@ export abstract class Eye extends Box {
   pupilRadius: number;
   blinking: BlinkingModes;
   private _framesSinceShake: number = -1;
+  private _shakeDuration: number | null = null;
 
+  static readonly DEFAULT_SHAKE_DURATION = 20;
   static readonly BLINK_SPEED = 2;
   static readonly DEFAULT_ABSTRACT_CONFIG: Required<EyeProps> = {
     ...Box.DEFAULT_PROPS,
@@ -93,9 +95,11 @@ export abstract class Eye extends Box {
   }
 
   updateShaking() {
-    if (this._framesSinceShake >= 0 && this._framesSinceShake < 20) {
+    if (!this._shakeDuration) return;
+
+    if (this._framesSinceShake >= 0 && this._framesSinceShake < this._shakeDuration) {
       this.shake();
-    } else if (this._framesSinceShake >= 20) {
+    } else if (this._framesSinceShake >= this._shakeDuration) {
       this.endShaking();
     }
   }
@@ -134,11 +138,13 @@ export abstract class Eye extends Box {
     this._framesSinceShake++;
   }
 
-  startShaking() {
+  startShaking(duration: number = Eye.DEFAULT_SHAKE_DURATION) {
     this._framesSinceShake = 0;
+    this._shakeDuration = duration;
   }
 
   endShaking() {
     this._framesSinceShake = -1;
+    this._shakeDuration = null;
   }
 }
