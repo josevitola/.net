@@ -241,4 +241,26 @@ export class Box {
   isHovered(ctx: CanvasRenderingContext2D, mousePos: Point) {
     return ctx.isPointInPath(this.getExternalBoxPath(this.upperLeft), mousePos.x, mousePos.y);
   }
+
+  updateCursor(ctx: CanvasRenderingContext2D, mousePos: Point) {
+    let cursor = '';
+    if (this.upperLeft.isHovered(mousePos)) {
+      cursor = 'url("/cursors/curved-arrow.png") 8 8, auto';
+    } else if (this.upperRight.isHovered(mousePos)) {
+      cursor = 'url("/cursors/curved-arrow-90.png") 8 8, auto';
+    } else if (this.lowerLeft.isHovered(mousePos)) {
+      cursor = 'url("/cursors/curved-arrow-270.png") 8 8, auto';
+    } else if (this.lowerRight.isHovered(mousePos)) {
+      cursor = 'url("/cursors/curved-arrow-180.png") 8 8, auto';
+    } else if (this.upperCenter.isHovered(mousePos)) {
+      cursor = 'n-resize';
+    } else if (this.leftCenter.isHovered(mousePos)) {
+      cursor = 'w-resize';
+    } else if (this.rightCenter.isHovered(mousePos)) {
+      cursor = 'e-resize';
+    } else if (this.isHovered(ctx, mousePos)) {
+      cursor = 'grab';
+    }
+    ctx.canvas.style.cursor = cursor;
+  }
 }

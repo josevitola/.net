@@ -30,14 +30,13 @@ type EyelidConfig = {
 export abstract class Eye extends Box {
   pupilRadius: number;
   blinking: BlinkingModes;
+  private _framesSinceShake: number = -1;
 
   static readonly BLINK_SPEED = 2;
-
   static readonly DEFAULT_ABSTRACT_CONFIG: Required<EyeProps> = {
     ...Box.DEFAULT_PROPS,
     pupilRadius: 0,
   };
-
   static readonly DEFAULT_EYELID_CONFIG: EyelidConfig = {
     dir: LidDirections.UP,
   };
@@ -53,7 +52,12 @@ export abstract class Eye extends Box {
     this.blinking = BlinkingModes.IDLE;
   }
 
-  draw(ctx: CanvasRenderingContext2D, followConfig?: EyeFollowConfig) {
+  update(ctx: CanvasRenderingContext2D, followConfig?: EyeFollowConfig) {
+    this.draw(ctx, followConfig);
+    this.updateActions();
+  }
+
+  private draw(ctx: CanvasRenderingContext2D, followConfig?: EyeFollowConfig) {
     ctx.save();
     this.setupContext(ctx);
     this.drawContour(ctx);
@@ -70,6 +74,18 @@ export abstract class Eye extends Box {
   protected abstract drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig): void;
   protected abstract drawContour(ctx: CanvasRenderingContext2D): void;
 
+  private updateActions() {
+    this.updateShaking();
+  }
+
+  updateShaking() {
+    if (this._framesSinceShake >= 0 && this._framesSinceShake < 20) {
+      this.shake();
+    } else if (this._framesSinceShake >= 20) {
+      this.endShaking();
+    }
+  }
+
   setupContext(ctx: CanvasRenderingContext2D) {
     ctx.translate(this.center.x, this.center.y);
     ctx.rotate(this.inclination);
@@ -78,28 +94,6 @@ export abstract class Eye extends Box {
   startBlinking() {
     const { IDLE, OPENING } = BlinkingModes;
     if (this.blinking === IDLE) this.blinking = OPENING;
-  }
-
-  updateCursor(ctx: CanvasRenderingContext2D, mousePos: Point) {
-    let cursor = '';
-    if (this.upperLeft.isHovered(mousePos)) {
-      cursor = 'url("/cursors/curved-arrow.png") 8 8, auto';
-    } else if (this.upperRight.isHovered(mousePos)) {
-      cursor = 'url("/cursors/curved-arrow-90.png") 8 8, auto';
-    } else if (this.lowerLeft.isHovered(mousePos)) {
-      cursor = 'url("/cursors/curved-arrow-270.png") 8 8, auto';
-    } else if (this.lowerRight.isHovered(mousePos)) {
-      cursor = 'url("/cursors/curved-arrow-180.png") 8 8, auto';
-    } else if (this.upperCenter.isHovered(mousePos)) {
-      cursor = 'n-resize';
-    } else if (this.leftCenter.isHovered(mousePos)) {
-      cursor = 'w-resize';
-    } else if (this.rightCenter.isHovered(mousePos)) {
-      cursor = 'e-resize';
-    } else if (this.isHovered(ctx, mousePos)) {
-      cursor = 'grab';
-    }
-    ctx.canvas.style.cursor = cursor;
   }
 
   protected calcPupilPositionToEyeCenter(followConfig: EyeFollowConfig) {
@@ -120,8 +114,17 @@ export abstract class Eye extends Box {
     return { x: mappedX, y: mappedY };
   }
 
-  startShaking() {
-    const randomAngle = (Math.random() - 0.5) * 0.2; // Random angle between -0.1 and 0.1 radians
+  shake() {
+    const randomAngle = (Math.random() - 0.5) * 0.2;
     this.inclination += randomAngle;
+    this._framesSinceShake++;
+  }
+
+  startShaking() {
+    this._framesSinceShake = 0;
+  }
+
+  endShaking() {
+    this._framesSinceShake = -1;
   }
 }

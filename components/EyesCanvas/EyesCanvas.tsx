@@ -78,7 +78,7 @@ const EyesCanvas = ({ eyeList, height, width, ...rest }: EyesCanvasProps) => {
           eye.updateBlink();
         }
 
-        eye.draw(ctx, {
+        eye.update(ctx, {
           follow: mousePos,
           windowHeight: height,
           windowWidth: width,
