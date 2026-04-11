@@ -34,7 +34,7 @@ export class ImageEye extends Eye {
   }
 
   protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig) {
-    const { x: pupilX, y: pupilY } = this.calculatePupilPosition(followConfig);
+    const { x: pupilX, y: pupilY } = this.calcPupilPositionToEyeCenter(followConfig);
     const { width: pupilWidth, height: pupilHeight } = this.pupil;
 
     ctx.resetTransform();

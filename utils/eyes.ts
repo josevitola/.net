@@ -45,22 +45,25 @@ export function initializeDrawnEyes({ width, height }: { width: number; height: 
   });
 }
 
-export function initializeImageEyes({
-  cornea,
-  pupil,
-  width,
-  height,
-}: ImageEyeAssets & {
-  width: number;
-  height: number;
+export function createImageEyeInCenter({
+  assets,
+  canvasWidth,
+  canvasHeight,
+}: & {
+  assets: ImageEyeAssets[];
+  canvasWidth: number;
+  canvasHeight: number;
 }) {
+  const asset = assets[0];
+  const { cornea, pupil } = asset;
   if (!cornea.img.complete || !pupil.img.complete) return [];
   return [
     new ImageEye({
       cornea: cornea,
       pupil: pupil,
-      center: new Point(width / 2, height / 2),
+      center: new Point(canvasWidth / 2, canvasHeight / 2),
       pupilRadius: 30,
+      inclination: Math.PI / 2,
     }),
   ];
 }
@@ -154,7 +157,7 @@ export function generateEyeList({
   canvasHeight,
   mode,
 }: CreateRandomEyesParams & {
-  mode: 'chaotic' | 'grid' | 'random';
+  mode: 'chaotic' | 'grid' | 'random' | 'center';
 }): ImageEye[] {
   switch (mode) {
     case 'chaotic':
@@ -163,6 +166,8 @@ export function generateEyeList({
       return createEyesInGrid({ assets, count, canvasWidth, canvasHeight });
     case 'random':
       return randomlyCreateRandomEyes({ assets, count, canvasWidth, canvasHeight });
+    case 'center':
+      return createImageEyeInCenter({ assets, canvasWidth, canvasHeight })
     default:
       return chaoticallyCreateRandomEyes({ assets, count, canvasWidth, canvasHeight });
   }

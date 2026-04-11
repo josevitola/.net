@@ -49,6 +49,8 @@ export abstract class Eye {
 
   dragMode?: DragModes;
 
+  private _info: string = '';
+
   static readonly DEFAULT_INCLINATION = Math.PI / 2;
   static readonly BLINK_SPEED = 2;
   static readonly NUM_PUPILS = 3;
@@ -118,10 +120,22 @@ export abstract class Eye {
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.fillText(
-      `${this.id} (${(this.inclination / Math.PI).toFixed(2)}π)`,
+      this.info,
       this.lowerCenter.x,
       this.lowerCenter.y + Eye.INFO_FONT_SIZE + Eye.EXTERNAL_MARGIN * 1.5,
     );
+  }
+
+  protected get info() {
+    return this._info || this.debugInfo;
+  }
+
+  protected set info(value: string) {
+    this._info = value;
+  }
+
+  protected get debugInfo() {
+    return `${this.id} (${(this.inclination / Math.PI).toFixed(2)}π)`;
   }
 
   protected get upperCenter() {
@@ -314,7 +328,7 @@ export abstract class Eye {
     return this.center.addX(this.width / 2).addY(this.height / 2);
   }
 
-  protected calculatePupilPosition(followConfig: EyeFollowConfig) {
+  protected calcPupilPositionToEyeCenter(followConfig: EyeFollowConfig) {
     const { x, y } = followConfig.follow ?? new Point();
 
     const mappedX = mapToRange(

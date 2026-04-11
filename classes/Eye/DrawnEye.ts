@@ -76,7 +76,7 @@ export class DrawnEye extends Eye {
 
   protected drawPupil(ctx: CanvasRenderingContext2D, followConfig: EyeFollowConfig) {
     const { pupilRadius: r } = this;
-    const { x: pupilX, y: pupilY } = this.calculatePupilPosition(followConfig);
+    const { x: pupilX, y: pupilY } = this.calcPupilPositionToEyeCenter(followConfig);
 
     ctx.save();
     ctx.resetTransform();
