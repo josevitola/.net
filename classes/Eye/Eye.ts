@@ -1,6 +1,6 @@
 import { picoid } from '@/utils/random';
 import { Point } from '../Point';
-import { mapToRange } from '@/utils/math';
+import { scale } from '@/utils/math';
 import { Rect } from '../Rect';
 
 export type EssentialEyeProps = Pick<Eye, 'center' | 'pupilRadius' | 'inclination'>;
@@ -330,18 +330,20 @@ export abstract class Eye {
 
   protected calcPupilPositionToEyeCenter(followConfig: EyeFollowConfig) {
     const { x, y } = followConfig.follow ?? new Point();
+    const cx = this.center.x;
+    const cy = this.center.y;
+    const dx = x - cx;
+    const dy = y - cy;
 
-    const mappedX = mapToRange(
-      x - this.center.x,
-      [0, followConfig.windowWidth / 2],
-      [0, this.width / 2 - this.pupilRadius],
-    );
+    const mappedX = dx > 0
+      ? cx + scale(dx, [0, followConfig.windowWidth], [0, this.width / 2])
+      : cx + scale(dx, [0, -followConfig.windowWidth], [0, -this.width / 2]);
 
-    const mappedY = mapToRange(
-      y - this.center.y,
-      [0, followConfig.windowHeight / 2],
-      [0, this.pupilRadius],
-    );
+    const mappedY = dy > 0
+      ? cy + scale(dy, [0, followConfig.windowHeight], [0, this.height / 2])
+      : cy + scale(dy, [0, -followConfig.windowHeight], [0, -this.height / 2]);
+
+    this.info = `dx: ${dx.toFixed(2)}, minx: ${(-this.center.x).toFixed(2)}, maxx: ${(followConfig.windowWidth - this.center.x).toFixed(2)}, mappedX: ${mappedX.toFixed(2)}`;
 
     return { x: mappedX, y: mappedY };
   }

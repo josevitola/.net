@@ -63,7 +63,7 @@ export function createImageEyeInCenter({
       pupil: pupil,
       center: new Point(canvasWidth / 2, canvasHeight / 2),
       pupilRadius: 30,
-      inclination: Math.PI / 2,
+      // inclination: Math.PI / 2,
     }),
   ];
 }

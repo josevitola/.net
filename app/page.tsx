@@ -16,7 +16,11 @@ export default function Home() {
     if (!ready) return [];
 
     return generateEyeList({
-      count: getDeviceSizeCategory() === 'mobile' ? 18 : 30,
+      count: {
+        mobile: 20,
+        tablet: 25,
+        desktop: 30,
+      }[getDeviceSizeCategory()] || 20,
       assets,
       canvasWidth: width,
       canvasHeight: height,

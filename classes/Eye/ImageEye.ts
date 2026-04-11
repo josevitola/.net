@@ -38,7 +38,6 @@ export class ImageEye extends Eye {
     const { width: pupilWidth, height: pupilHeight } = this.pupil;
 
     ctx.resetTransform();
-    ctx.translate(this.center.x - pupilWidth / 2, this.center.y - pupilHeight / 2);
-    ctx.drawImage(this.pupil.img, pupilX, pupilY, pupilWidth, pupilHeight);
+    ctx.drawImage(this.pupil.img, pupilX - pupilWidth / 2, pupilY - pupilHeight / 2, pupilWidth, pupilHeight);
   }
 }
