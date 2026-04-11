@@ -6,12 +6,12 @@
  * @param newRange Range to map to
  * @return Mapped value
  */
-export function scale(
+export function toNewRange(
   value: number,
-  [in_min, in_max]: [number, number],
-  [out_min, out_max]: [number, number],
+  [inMin, inMax]: [number, number],
+  [outMin, outMax]: [number, number],
 ) {
-  return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 
 export function randomInRange(min: number, max: number): number {

@@ -1,4 +1,4 @@
-import { scale, toNextOdd } from '@/utils/math';
+import { toNewRange, toNextOdd } from '@/utils/math';
 import { ControlledImage } from '../ControlledImage';
 import { TimeAction } from '../TimeAction';
 import { Eye, MouseInfo, EssentialEyeProps } from './Eye';
@@ -48,7 +48,7 @@ export class ImageEye extends Eye {
   }
 
   focus(framesElapsed: number) {
-    const scaledX = scale(framesElapsed, [0, this.focusAction.duration], [0, 2 * Math.PI]);
+    const scaledX = toNewRange(framesElapsed, [0, this.focusAction.duration], [0, 2 * Math.PI]);
     const imgScale = (Math.cos(scaledX) + 3) / 4;
     console.log({ framesElapsed, scaledX: scaledX.toFixed(2), imgScale: imgScale.toFixed(2) });
     this.pupil.width = this._origPupilWidth * imgScale;

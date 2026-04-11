@@ -1,5 +1,5 @@
 import { Point } from '../Point';
-import { scale } from '@/utils/math';
+import { toNewRange } from '@/utils/math';
 import { Box } from '../Box';
 import { TimeAction } from '../TimeAction';
 
@@ -118,12 +118,12 @@ export abstract class Eye extends Box {
     const dy = y - cy;
 
     const mappedX = dx > 0
-      ? cx + scale(dx, [0, followConfig.windowWidth], [0, this.width / 2])
-      : cx + scale(dx, [0, -followConfig.windowWidth], [0, -this.width / 2]);
+      ? cx + toNewRange(dx, [0, followConfig.windowWidth], [0, this.width / 2])
+      : cx + toNewRange(dx, [0, -followConfig.windowWidth], [0, -this.width / 2]);
 
     const mappedY = dy > 0
-      ? cy + scale(dy, [0, followConfig.windowHeight], [0, this.height / 2])
-      : cy + scale(dy, [0, -followConfig.windowHeight], [0, -this.height / 2]);
+      ? cy + toNewRange(dy, [0, followConfig.windowHeight], [0, this.height / 2])
+      : cy + toNewRange(dy, [0, -followConfig.windowHeight], [0, -this.height / 2]);
 
     return { x: mappedX, y: mappedY };
   }
