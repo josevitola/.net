@@ -17,3 +17,7 @@ export function scale(
 export function randomInRange(min: number, max: number): number {
   return Math.random() * (max - min) + min;
 }
+
+export function toNextOdd(value: number): number {
+  return value % 2 === 0 ? value + 1 : value;
+}

@@ -30,6 +30,10 @@ export default function Home() {
     eyeList.forEach(eye => eye.startShaking(frames));
   }, [eyeList]);
 
+  const focusAllEyes = useCallback((frames?: number) => {
+    eyeList.forEach(eye => eye.startFocus(frames));
+  }, [eyeList]);
+
   useLayoutEffect(() => {
     setOnNavbarItemHover(() => () => {
       shakeAllEyes();
@@ -38,7 +42,8 @@ export default function Home() {
 
   const onMouseOverButton = useCallback(() => {
     shakeAllEyes(40);
-  }, [eyeList]);
+    focusAllEyes(40);
+  }, [shakeAllEyes, focusAllEyes]);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans">

@@ -36,7 +36,8 @@ type EyelidConfig = {
 export abstract class Eye extends Box {
   pupilRadius: number;
   blinking: BlinkingModes;
-  shakeAction: TimeAction;
+  private shakeAction: TimeAction;
+  private actions: TimeAction[];
 
   static readonly DEFAULT_SHAKE_DURATION = 20;
   static readonly BLINK_SPEED = 2;
@@ -57,6 +58,11 @@ export abstract class Eye extends Box {
     this.pupilRadius = pupilRadius;
     this.blinking = BlinkingModes.IDLE;
     this.shakeAction = new TimeAction(() => this.shake(), Eye.DEFAULT_SHAKE_DURATION);
+    this.actions = [this.shakeAction];
+  }
+
+  addAction(action: TimeAction) {
+    this.actions.push(action);
   }
 
   update(ctx: CanvasRenderingContext2D, { mouseInfo, debug }: UpdateProps) {
@@ -91,7 +97,7 @@ export abstract class Eye extends Box {
   protected abstract drawContour(ctx: CanvasRenderingContext2D): void;
 
   private updateActions() {
-    this.shakeAction.update();
+    this.actions.forEach(action => action.update());
   }
 
   setupContext(ctx: CanvasRenderingContext2D) {
@@ -129,9 +135,5 @@ export abstract class Eye extends Box {
 
   startShaking(durationInFrames: number = Eye.DEFAULT_SHAKE_DURATION) {
     this.shakeAction.start(durationInFrames);
-  }
-
-  endShaking() {
-    this.shakeAction.end();
   }
 }

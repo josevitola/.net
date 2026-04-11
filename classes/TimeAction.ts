@@ -1,30 +1,29 @@
 export class TimeAction {
+  duration: number = 0;
   private _framesElapsed: number = -1;
-  private _duration: number;
-  private _action: () => void
+  private _action: (framesElapsed: number) => void
 
-  constructor(action: () => void, durationInFrames: number) {
+  constructor(action: (framesElapsed: number) => void) {
     this._action = action;
-    this._duration = durationInFrames;
   }
 
   update() {
     if (this._framesElapsed < 0) return;
-    if (this._framesElapsed < this._duration) {
-      this._action();
+    if (this._framesElapsed < this.duration) {
+      this._action(this._framesElapsed);
       this._framesElapsed++;
     } else {
-      this.end();
+      this.stop();
     }
   }
 
   start(durationInFrames: number) {
     this._framesElapsed = 0;
-    this._duration = durationInFrames;
+    this.duration = durationInFrames;
   }
 
-  end() {
+  stop() {
     this._framesElapsed = -1;
-    this._duration = 0;
+    this.duration = 0;
   }
 }

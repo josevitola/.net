@@ -19,6 +19,14 @@ export class ControlledImage {
     this._width = value;
   }
 
+  scale(factor: number): void {
+    if (this._width !== null) {
+      this._width *= factor;
+    } else {
+      this._width = this.img.width * factor;
+    }
+  }
+
   copy(): ControlledImage {
     return new ControlledImage(this.img, this._width);
   }
