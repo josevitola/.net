@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, IM_Fell_DW_Pica } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "../components";
 import { GlobalContextProvider } from "@/context/GlobalContext";
 import { ResponsiveNavbar } from "@/components/ResponsiveNavbar/ResponsiveNavbar";
 

@@ -4,7 +4,7 @@ import photoCrowd from "@/public/photo-crowd.jpg";
 export default function AboutPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-4xl font-bold mb-4">Sobre mí</h1>
+      <h1 className="font-serif text-4xl font-bold mb-4">Sobre mí</h1>
       <Image
         src={photoCrowd}
         alt="Foto de José Vitola"
