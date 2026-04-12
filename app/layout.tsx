@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, IM_Fell_DW_Pica } from "next/font/google";
 import "./globals.css";
 import { GlobalContextProvider } from "@/context/GlobalContext";
-import { ResponsiveNavbar } from "@/components/ResponsiveNavbar/ResponsiveNavbar";
+import { ResponsiveNavbar } from "@/components/Navbar/ResponsiveNavbar";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
