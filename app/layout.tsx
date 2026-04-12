@@ -17,7 +17,7 @@ export const imFellDWPica = IM_Fell_DW_Pica({
 
 export const metadata: Metadata = {
   title: "José Vitola - Cantautor y compositor musical",
-  description: "Cantautor y compositor musical. Artista interdisciplinario. Bienvenido a mi sitio personal.",
+  description: "Cantautor y compositor musical. Artista interdisciplinario.",
 };
 
 export default function RootLayout({

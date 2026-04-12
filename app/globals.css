@@ -6,6 +6,8 @@
   --primary-light: #ffdbba;
   --primary: #b59880;
   --primary-active: #8c7562;
+  --secondary: #ba6071;
+  --secondary-active: #a0505f;
   --accent-color: #a85e1e;
   --accent-active-color: #96541b;
 }
@@ -16,6 +18,8 @@
   --color-primary-light: var(--primary-light);
   --color-primary: var(--primary);
   --color-primary-active: var(--primary-active);
+  --color-secondary: var(--secondary);
+  --color-secondary-active: var(--secondary-active);
   --color-accent: var(--accent-color);
   --color-accent-active: var(--accent-active-color);
   --font-sans: var(--font-dm-sans);

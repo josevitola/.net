@@ -7,9 +7,18 @@
   display: flex;
 }
 
+nav:has(#menu-toggle:checked) {
+  background: var(--color-background);
+}
+
 @media (min-width: 768px) {
+  nav {
+    background: transparent;
+  }
+
   .nav-links {
     display: flex;
     flex-direction: row;
+    background: transparent;
   }
 }
