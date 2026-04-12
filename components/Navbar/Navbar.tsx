@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { NAVBAR_ITEMS } from './Navbar.constants';
-import './ResponsiveNavbar.css';
+import './Navbar.css';
 import { IM_Fell_DW_Pica } from 'next/font/google';
 
 const imFellDWPica = IM_Fell_DW_Pica({
@@ -8,7 +8,7 @@ const imFellDWPica = IM_Fell_DW_Pica({
   weight: '400',
 });
 
-export const ResponsiveNavbar = () => {
+export const Navbar = () => {
   return (
     <nav
       className={`${imFellDWPica.className} sticky top-0 flex h-20 w-full items-center justify-between px-6 py-4 md:px-10`}

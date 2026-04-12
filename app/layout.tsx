@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, IM_Fell_DW_Pica } from "next/font/google";
 import "./globals.css";
 import { GlobalContextProvider } from "@/context/GlobalContext";
-import { ResponsiveNavbar } from "@/components/Navbar/ResponsiveNavbar";
+import { Navbar } from "@/components/Navbar/Navbar";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <GlobalContextProvider>
           {/* <Navbar /> */}
-          <ResponsiveNavbar />
+          <Navbar />
           {children}
         </GlobalContextProvider>
       </body>
